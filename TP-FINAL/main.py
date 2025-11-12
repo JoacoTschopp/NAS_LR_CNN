@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 
 from src.arqui_cnn import BaseModel, SimpleCNN, ImprovedCNN, ResNetCIFAR
@@ -13,15 +15,30 @@ def main():
     #Que fierro tengo??
     que_fierro_tengo()
 
+    # Experimento Nombre y rutas de salida
+    experiment_name = "Grupo_3_V2"
+    experiments_root = Path("../experiments")
+    experiment_dir = experiments_root / experiment_name
+
+    checkpoints_dir = experiment_dir / "checkpoints"
+    plots_dir = experiment_dir / "plots"
+    artifacts_dir = experiment_dir / "artifacts"
+
+    for directory in (experiment_dir, checkpoints_dir, plots_dir, artifacts_dir):
+        directory.mkdir(parents=True, exist_ok=True)
+
+    # Crear carpeta datasets
+    datasets = Path("../datasets")
+    
     # 1. Cargar datos
-    datasets_folder = load_data()
+    datasets_folder = load_data(datasets_folder=str(datasets))
 
 
     # Comparar arquitecturas
     compare_models()
 
     # Dibujar arquitectura
-    draw_model(SimpleCNN())
+    draw_model(SimpleCNN(), output_dir=artifacts_dir)
 
     # 2. Preprocesamiento de Datos
 
@@ -34,13 +51,21 @@ def main():
     # ==============================================================================
 
     config = {
-        'lr': 0.001,
-        'epochs': 100,
+        'lr': 0.1,
+        'epochs': 200,
         'batch_size': 64,
-        'patience': 10,
-        #'momentum': 0.9, #Solo para SGD
-        'checkpoint_dir': 'models/',
-        'optimizer': 'AdamW',
+        'patience': 20,
+        'optimizer': 'SGD',
+        'momentum': 0.9,
+        'weight_decay': 5e-4,
+        'nesterov': True,
+        'use_scheduler': True,
+        'warmup_epochs': 5,
+        'label_smoothing': 0.1,
+        'checkpoint_dir': str(checkpoints_dir),
+        'experiment_dir': str(experiment_dir),
+        'plots_dir': str(plots_dir),
+        'artifacts_dir': str(artifacts_dir),
     }
 
     # Actualizar variables globales para compatibilidad
@@ -107,7 +132,7 @@ def main():
     # VISUALIZACIÓN DE PREPROCESAMIENTOS E HIPERPARÁMETROS DEL ENTRENAMIENTO
     # ==============================================================================
 
-    # pipeline.describe_pipeline(cifar10_training.transform, cifar10_validation.transform)
+    pipeline.describe_pipeline(cifar10_training.transform, cifar10_validation.transform)
 
     # ==============================================================================
     # VISUALIZACIÓN DE CURVAS DE ENTRENAMIENTO

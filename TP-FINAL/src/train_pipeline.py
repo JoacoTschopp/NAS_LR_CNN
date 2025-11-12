@@ -1,6 +1,7 @@
 import os
 import textwrap
 from datetime import datetime
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -42,19 +43,47 @@ class TrainingPipeline:
 
         # Optimizador y loss
         optimizer_type = config.get("optimizer", "SGD")
-        for optimizer in optim.__dict__:
-            if optimizer == optimizer_type:
-                self.optimizer = optim.__dict__[optimizer](
-                    self.model.parameters(),
-                    lr=config["lr"],
-                    # momentum=config.get('momentum', 0.9) # NO for Adam
-                )
-                break
+        lr = config["lr"]
+        
+        # Construir optimizador con parámetros específicos
+        if optimizer_type == "SGD":
+            self.optimizer = optim.__dict__[optimizer_type](
+                self.model.parameters(),
+                lr=lr,
+                momentum=config.get("momentum", 0.9),
+                weight_decay=config.get("weight_decay", 5e-4),
+                nesterov=config.get("nesterov", True),
+            )
+        elif optimizer_type == "Adam" or optimizer_type == "AdamW":
+            self.optimizer = optim.__dict__[optimizer_type](
+                self.model.parameters(),
+                lr=lr,
+                weight_decay=config.get("weight_decay", 0.0),
+            )
+        else:
+            # Fallback genérico
+            self.optimizer = optim.__dict__[optimizer_type](
+                self.model.parameters(), lr=lr
+            )
 
-        # Mantenemos solo esta loss por las clases y el label smoothing para pruebas
+        # Scheduler (Cosine Annealing con warmup)
+        self.use_scheduler = config.get("use_scheduler", False)
+        self.warmup_epochs = config.get("warmup_epochs", 0)
+        self.scheduler = None
+        
+        if self.use_scheduler:
+            total_epochs = config["epochs"]
+            T_max = total_epochs - self.warmup_epochs
+            self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
+                self.optimizer, T_max=T_max
+            )
+            print(f"✓ Scheduler: CosineAnnealingLR (T_max={T_max}, warmup={self.warmup_epochs})")
+
+        # Loss function con label smoothing
+        label_smoothing = config.get("label_smoothing", 0.05)
         self.loss_function = nn.CrossEntropyLoss(
             # https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#:~:text=Default%3A%20%27mean%27-,label_smoothing,-(float%2C
-            label_smoothing=0.05  # Por defecto es 0.0
+            label_smoothing=label_smoothing # Por defecto es 0.0
         ).to(self.device)
 
         # Estado del entrenamiento
@@ -65,9 +94,25 @@ class TrainingPipeline:
         self.best_epoch = 0
         self.current_epoch = 0
 
-        # Directorio de checkpoints
-        self.checkpoint_dir = config.get("checkpoint_dir", "models/")
-        os.makedirs(self.checkpoint_dir, exist_ok=True)
+        # Directorios de salida del experimento
+        self.experiment_dir = Path(config.get("experiment_dir", "experiments"))
+        self.checkpoint_dir = Path(config.get("checkpoint_dir", self.experiment_dir))
+        self.plots_dir = Path(config.get("plots_dir", self.experiment_dir))
+        self.artifacts_dir = Path(config.get("artifacts_dir", self.experiment_dir))
+
+        for directory in (self.experiment_dir, self.checkpoint_dir, self.plots_dir, self.artifacts_dir):
+            directory.mkdir(parents=True, exist_ok=True)
+
+    def _timestamp(self):
+        return datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    def _save_figure(self, fig, filename, directory=None):
+        target_dir = directory or self.plots_dir
+        target_dir.mkdir(parents=True, exist_ok=True)
+        filepath = target_dir / filename
+        fig.savefig(filepath, bbox_inches="tight")
+        print(f"✓ Figura guardada en {filepath}")
+        return filepath
 
     def _detect_device(self):
         """Detecta el mejor dispositivo disponible"""
@@ -142,6 +187,12 @@ class TrainingPipeline:
             for epoch in range(1, self.config["epochs"] + 1):
                 self.current_epoch = epoch
 
+                # Warmup manual
+                if self.use_scheduler and epoch <= self.warmup_epochs:
+                    scale = epoch / self.warmup_epochs
+                    for param_group in self.optimizer.param_groups:
+                        param_group["lr"] = self.config["lr"] * scale
+
                 # Entrenar
                 train_loss = self._train_epoch(train_loader)
                 self.train_losses.append(train_loss)
@@ -151,9 +202,13 @@ class TrainingPipeline:
                 self.val_losses.append(val_loss)
                 self.val_metrics.append(val_acc)
 
+                # Obtener LR actual
+                current_lr = self.optimizer.param_groups[0]["lr"]
+
                 # Logging
                 print(
                     f"Epoch {epoch:02d} | "
+                    f"LR: {current_lr:.6f} | "
                     f"Train Loss: {train_loss:.4f} | "
                     f"Val Loss: {val_loss:.4f} | "
                     f"Val Acc: {val_acc:.2%}",
@@ -171,6 +226,10 @@ class TrainingPipeline:
                     patience_counter += 1
 
                 print()
+
+                # Step del scheduler después de warmup
+                if self.use_scheduler and epoch > self.warmup_epochs:
+                    self.scheduler.step()
 
                 # Checkpoint periódico
                 if epoch % 5 == 0:
@@ -213,7 +272,7 @@ class TrainingPipeline:
 
     def save_checkpoint(self, filename, is_best=False):
         """Guarda checkpoint del estado actual"""
-        filepath = os.path.join(self.checkpoint_dir, filename)
+        filepath = self.checkpoint_dir / filename
         checkpoint = {
             "epoch": self.current_epoch,
             "model_state_dict": self.model.state_dict(),
@@ -225,16 +284,18 @@ class TrainingPipeline:
             "val_metrics": self.val_metrics,
             "config": self.config,
         }
-        torch.save(checkpoint, filepath)
+        if self.scheduler is not None:
+            checkpoint["scheduler_state_dict"] = self.scheduler.state_dict()
+        torch.save(checkpoint, str(filepath))
 
     def load_checkpoint(self, filename):
         """Carga checkpoint desde archivo"""
-        filepath = os.path.join(self.checkpoint_dir, filename)
-        if not os.path.exists(filepath):
+        filepath = self.checkpoint_dir / filename
+        if not filepath.exists():
             print(f"! Checkpoint no encontrado: {filepath}")
             return False
 
-        checkpoint = torch.load(filepath, map_location=self.device, weights_only=False)
+        checkpoint = torch.load(str(filepath), map_location=self.device, weights_only=False)
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         self.current_epoch = checkpoint["epoch"]
@@ -243,6 +304,9 @@ class TrainingPipeline:
         self.train_losses = checkpoint["train_losses"]
         self.val_losses = checkpoint["val_losses"]
         self.val_metrics = checkpoint["val_metrics"]
+        
+        if self.scheduler is not None and "scheduler_state_dict" in checkpoint:
+            self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
 
         print(f"✓ Checkpoint cargado: {filename}")
         print(f"  Época: {self.current_epoch}, Acc: {self.best_val_acc:.2%}")
@@ -465,7 +529,10 @@ class TrainingPipeline:
         draw_block(
             ax_tf, "Transformaciones de preprocesamiento", tf_lines, line_height=0.035
         )
+        filename = f"pipeline_summary_{self._timestamp()}.png"
+        self._save_figure(fig, filename, self.artifacts_dir)
         plt.show()
+        plt.close(fig)
 
     def plot_training_curves(self):
         """Genera gráficos de curvas de entrenamiento"""
@@ -568,9 +635,18 @@ class TrainingPipeline:
             )
 
         plt.tight_layout()
+        filename = f"training_curves_{self._timestamp()}.png"
+        self._save_figure(fig, filename)
         plt.show()
+        plt.close(fig)
 
-    def plot_confusion_matrix(self, predictions, labels, class_names):
+    def plot_confusion_matrix(
+        self,
+        predictions,
+        labels,
+        class_names,
+        dataset_name: str | None = None,
+    ):
         """Genera matriz de confusión"""
         cm = confusion_matrix(labels, predictions)
 
@@ -588,7 +664,12 @@ class TrainingPipeline:
         ax.set_ylabel("Real", fontweight="bold")
         ax.set_title("Matriz de Confusión", fontweight="bold", pad=15)
         plt.tight_layout()
+        dataset_label = dataset_name if isinstance(dataset_name, str) else "dataset"
+        dataset_slug = dataset_label.replace(" ", "_")
+        filename = f"confusion_matrix_{dataset_slug}_{self._timestamp()}.png"
+        self._save_figure(fig, filename, self.artifacts_dir)
         plt.show()
+        plt.close(fig)
 
     def plot_examples(
         self,
@@ -602,6 +683,8 @@ class TrainingPipeline:
         n_incorrect=10,
     ):
         """Muestra ejemplos de predicciones correctas e incorrectas"""
+
+        timestamp = self._timestamp()
 
         def denormalize(img, mean, std):
             img_denorm = img.copy()
@@ -638,7 +721,10 @@ class TrainingPipeline:
                 ax.axis("off")
 
         plt.tight_layout()
+        filename_correct = f"predictions_correct_{timestamp}.png"
+        self._save_figure(fig, filename_correct, self.artifacts_dir)
         plt.show()
+        plt.close(fig)
 
         # Ejemplos incorrectos
         if len(incorrect_idx) > 0:
@@ -665,7 +751,10 @@ class TrainingPipeline:
                     ax.axis("off")
 
             plt.tight_layout()
+            filename_incorrect = f"predictions_incorrect_{timestamp}.png"
+            self._save_figure(fig, filename_incorrect, self.artifacts_dir)
             plt.show()
+            plt.close(fig)
 
 
 print("✓ Clase TrainingPipeline cargada exitosamente")

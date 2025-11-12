@@ -51,13 +51,9 @@ def load_data(datasets_folder: str | None = None) -> str:
         datasets_folder = "../datasets"
     makedirs(datasets_folder, exist_ok=True)
 
-    # Carpeta para datos nuevos (CIFAR10.1)
-    new_datasets_folder = f"{datasets_folder}/Grupo_3"
-    makedirs(new_datasets_folder, exist_ok=True)
-
     # Rutas de los archivos
-    data_file = path.join(new_datasets_folder, "cifar10.1_v4_data.npy")
-    labels_file = path.join(new_datasets_folder, "cifar10.1_v4_labels.npy")
+    data_file = path.join(datasets_folder, "cifar10.1_v4_data.npy")
+    labels_file = path.join(datasets_folder, "cifar10.1_v4_labels.npy")
 
     # URLs de descarga
     data_url = "https://github.com/modestyachts/CIFAR-10.1/raw/master/datasets/cifar10.1_v4_data.npy"
@@ -67,9 +63,9 @@ def load_data(datasets_folder: str | None = None) -> str:
     download_file(labels_url, labels_file)
 
     # Listar archivos en la carpeta
-    print(f"\nArchivos en {new_datasets_folder}:")
-    for item in os.listdir(new_datasets_folder):
-        item_path = path.join(new_datasets_folder, item)
+    print(f"\nArchivos en {datasets_folder}:")
+    for item in os.listdir(datasets_folder):
+        item_path = path.join(datasets_folder, item)
     if path.isfile(item_path):
         size_mb = path.getsize(item_path) / (1024 * 1024)
         print(f"  - {item} ({size_mb:.2f} MB)")

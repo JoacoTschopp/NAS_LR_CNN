@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 from .arqui_cnn import BaseModel, ImprovedCNN, ResNetCIFAR, SimpleCNN
@@ -46,12 +48,18 @@ def compare_models():
     print("\nPara comparar modelos ejecuta: compare_models()")
 
 
-def draw_model(model: nn.Module):
+def draw_model(model: nn.Module, output_dir=None):
     """Dibuja la arquitectura de un modelo"""
     if not TORCHVIEW_AVAILABLE:
         print("! torchview no está instalado. Instalar con: pip install torchview")
         return None
     model_graph = draw_graph(model, input_size=(1, 3, 32, 32), expand_nested=True)
+    if output_dir is not None:
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        file_path = output_path / "model.png"
+        model_graph.visual_graph.save(file_path)
+        print(f"✓ Arquitectura guardada en {file_path}")
     return model_graph.visual_graph
 
 

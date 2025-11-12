@@ -1,3 +1,6 @@
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
 
 from .load import load_cifar101
@@ -39,41 +42,67 @@ def run_cifar101_evaluation(
 
     results = pipeline.evaluate(dataloader, dataset_name="CIFAR-10.1")
 
-    print("\n" + "=" * 70)
-    print("ACCURACY POR CLASE")
-    print("=" * 70)
-    for idx, class_name in enumerate(CLASS_NAMES):
-        mask = labels == idx
-        if mask.sum() > 0:
-            class_acc = (
-                results["predictions"][mask] == labels[mask]
-            ).sum() / mask.sum()
-            print(f"  {class_name:12s}: {class_acc:6.2%}  ({mask.sum():4d} samples)")
-    print("=" * 70)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    base_dir = getattr(pipeline, "artifacts_dir", None)
+    base_dir = Path(base_dir) if base_dir is not None else Path("experiments")
+    base_dir.mkdir(parents=True, exist_ok=True)
+    log_path = base_dir / f"cifar101_evaluation_{timestamp}.txt"
 
-    print("\n4. Generando matriz de confusión...")
-    pipeline.plot_confusion_matrix(
-        results["predictions"], results["labels"], CLASS_NAMES
-    )
+    total_samples = len(results["labels"])
+    correct_predictions = int((results["predictions"] == results["labels"]).sum())
 
-    print("\n5. Mostrando ejemplos de predicciones...")
-    images = data["images"].astype(np.float32) / 255.0
-    images = (images - mean.reshape(1, 1, 1, 3)) / std.reshape(1, 1, 1, 3)
-    images = np.transpose(images, (0, 3, 1, 2))
+    with open(log_path, "w", encoding="utf-8") as log_file:
+        def log(message: str = ""):
+            print(message)
+            log_file.write(message + "\n")
 
-    pipeline.plot_examples(
-        images,
-        results["predictions"],
-        results["labels"],
-        CLASS_NAMES,
-        mean,
-        std,
-        n_correct=10,
-        n_incorrect=10,
-    )
+        log("\n" + "=" * 70)
+        log("EVALUACIÓN CIFAR-10.1")
+        log("=" * 70)
+        log(f"Accuracy global: {results['accuracy']:.2%}")
+        log(f"Correctas: {correct_predictions}/{total_samples}")
 
-    print("\n" + "=" * 70)
-    print("EVALUACIÓN COMPLETADA")
-    print("=" * 70)
+        log("\nACCURACY POR CLASE")
+        log("=" * 70)
+        for idx, class_name in enumerate(CLASS_NAMES):
+            mask = labels == idx
+            if mask.sum() > 0:
+                class_acc = (
+                    results["predictions"][mask] == labels[mask]
+                ).sum() / mask.sum()
+                log(
+                    f"  {class_name:12s}: {class_acc:6.2%}  ({mask.sum():4d} samples)"
+                )
+        log("=" * 70)
 
+        log("\n4. Generando matriz de confusión...")
+        pipeline.plot_confusion_matrix(
+            results["predictions"],
+            results["labels"],
+            CLASS_NAMES,
+            dataset_name="CIFAR-10.1",
+        )
+
+        log("\n5. Mostrando ejemplos de predicciones...")
+        images = data["images"].astype(np.float32) / 255.0
+        images = (images - mean.reshape(1, 1, 1, 3)) / std.reshape(1, 1, 1, 3)
+        images = np.transpose(images, (0, 3, 1, 2))
+
+        pipeline.plot_examples(
+            images,
+            results["predictions"],
+            results["labels"],
+            CLASS_NAMES,
+            mean,
+            std,
+            n_correct=10,
+            n_incorrect=10,
+        )
+
+        log("\n" + "=" * 70)
+        log("EVALUACIÓN COMPLETADA")
+        log("=" * 70)
+        log(f"Reporte guardado en: {log_path}")
+
+    results["report_path"] = str(log_path)
     return results
