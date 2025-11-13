@@ -21,3 +21,6 @@ TP-FINAL/models
 TP-FINAL/plots
 TP-FINAL/artifacts
 TP-FINAL/Notebook_materia
+
+.isort.cfg
+.ruff.toml
