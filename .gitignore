@@ -11,16 +11,16 @@ __pycache__/
 dist/
 build/
 .DS_Store
-/TP-FINAL/datasets
-/TP-FINAL/models/*.pth
+/app/datasets
+/app/models/*.pth
 
 datasets/
-TP-FINAL/datasets
-TP-FINAL/experiments
-TP-FINAL/models
-TP-FINAL/plots
-TP-FINAL/artifacts
-TP-FINAL/Notebook_materia
+datasets
+experiments
+models
+plots
+artifacts
+Notebook_materia
 
 .isort.cfg
 .ruff.toml
