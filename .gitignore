@@ -24,3 +24,5 @@ TP-FINAL/Notebook_materia
 
 .isort.cfg
 .ruff.toml
+
+/Clases_Practicas/
