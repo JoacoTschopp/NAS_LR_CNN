@@ -16,4 +16,8 @@ build/
 
 datasets/
 TP-FINAL/datasets
-experiments/
+TP-FINAL/experiments
+TP-FINAL/models
+TP-FINAL/plots
+TP-FINAL/artifacts
+TP-FINAL/Notebook_materia
