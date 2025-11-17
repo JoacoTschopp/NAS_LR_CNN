@@ -2,7 +2,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from .arqui_cnn import BaseModel, ImprovedCNN, ResNetCIFAR, SimpleCNN
+from .arqui_cnn import BaseModel, ImprovedCNN, ResNetCIFAR, SimpleCNN, NASCNN15
 
 try:
     from torchview import draw_graph
@@ -22,6 +22,7 @@ def compare_models():
         "SimpleCNN": SimpleCNN(),
         "ImprovedCNN": ImprovedCNN(),
         "ResNetCIFAR": ResNetCIFAR(),
+        "NASCNN15": NASCNN15(),
     }
 
     print("=" * 70)

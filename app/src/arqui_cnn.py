@@ -1,5 +1,7 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 
 # ==============================================================================
 # ARQUITECTURA DEL MODELO 1.0
@@ -298,3 +300,192 @@ class ResNetCIFAR(nn.Module):
 
     def predict(self, x):
         return self.final_activation(self.forward(x))
+
+
+##################################################################################################
+
+
+
+# ==============================================================================
+# NAS-CNN v1 (Zoph & Le, 2017) - 15 capas sin stride ni pooling
+# ==============================================================================
+class NASCNN15(nn.Module):
+    """
+    Reimplementación aproximada de la arquitectura de 15 capas para CIFAR-10
+    (NAS v1, sin strides ni pooling, Figura 7 del paper).
+
+    - Todas las capas son: Conv2d -> BatchNorm -> ReLU
+    - Resolución fija 32x32 (stride=1, padding para conservar tamaño)
+    - Muchas conexiones de salto de "un paso": capa i -> capas (i+1, i+2)
+      implementadas como concatenación en el eje de canales.
+    - Clasificador: global average pooling + capa totalmente conectada.
+
+    Detalle capa por capa (FH = filter height, FW = filter width, N = #filtros):
+
+      C1 : FH=3, FW=3, N=36; in = imagen RGB
+      C2 : FH=3, FW=3, N=48; in = C1
+      C3 : FH=3, FW=3, N=36; in = concat(C1, C2)
+      C4 : FH=3, FW=5, N=36; in = concat(C2, C3)
+      C5 : FH=5, FW=3, N=48; in = concat(C3, C4)
+      C6 : FH=1, FW=7, N=36; in = concat(C4, C5)
+      C7 : FH=7, FW=1, N=48; in = concat(C5, C6)
+      C8 : FH=3, FW=5, N=48; in = concat(C6, C7)
+      C9 : FH=5, FW=3, N=64; in = concat(C7, C8)
+      C10: FH=5, FW=7, N=64; in = concat(C8, C9)
+      C11: FH=7, FW=5, N=64; in = concat(C9, C10)
+      C12: FH=3, FW=7, N=64; in = concat(C10, C11)
+      C13: FH=7, FW=3, N=64; in = concat(C11, C12)
+      C14: FH=5, FW=7, N=64; in = concat(C12, C13)
+      C15: FH=7, FW=1, N=64; in = concat(C13, C14)
+
+    Comentarios de entrenamiento (paper NAS original):
+      - Optimizador: SGD con momentum de Nesterov
+      - LR inicial: 0.1 (seleccionado por grid search)
+      - Momentum: 0.9
+      - Weight decay (L2): 1e-4
+      - Epsilon de BatchNorm: ajustado en la búsqueda, típicamente 1e-5
+      - Batch size: no indicado; para CIFAR-10 se suele usar 128
+      - Nº de épocas: entrenamiento “hasta convergencia” (~200–300 epocas)
+        con scheduler que reduce la LR en uno o más puntos del entrenamiento
+    """
+
+    def __init__(self, num_classes: int = 10):
+        super().__init__()
+
+        # Capa 1: 3x3, 3 -> 36
+        self.conv1 = nn.Conv2d(3, 36, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(36)
+
+        # Capa 2: 3x3, 36 -> 48
+        self.conv2 = nn.Conv2d(36, 48, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(48)
+
+        # Capa 3: 3x3, (36+48) -> 36
+        self.conv3 = nn.Conv2d(36 + 48, 36, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(36)
+
+        # Capa 4: 3x5, (48+36) -> 36
+        self.conv4 = nn.Conv2d(48 + 36, 36, kernel_size=(3, 5), padding=(1, 2))
+        self.bn4 = nn.BatchNorm2d(36)
+
+        # Capa 5: 5x3, (36+36) -> 48
+        self.conv5 = nn.Conv2d(36 + 36, 48, kernel_size=(5, 3), padding=(2, 1))
+        self.bn5 = nn.BatchNorm2d(48)
+
+        # Capa 6: 1x7, (36+48) -> 36
+        self.conv6 = nn.Conv2d(36 + 48, 36, kernel_size=(1, 7), padding=(0, 3))
+        self.bn6 = nn.BatchNorm2d(36)
+
+        # Capa 7: 7x1, (48+36) -> 48
+        self.conv7 = nn.Conv2d(48 + 36, 48, kernel_size=(7, 1), padding=(3, 0))
+        self.bn7 = nn.BatchNorm2d(48)
+
+        # Capa 8: 3x5, (36+48) -> 48
+        self.conv8 = nn.Conv2d(36 + 48, 48, kernel_size=(3, 5), padding=(1, 2))
+        self.bn8 = nn.BatchNorm2d(48)
+
+        # Capa 9: 5x3, (48+48) -> 64
+        self.conv9 = nn.Conv2d(48 + 48, 64, kernel_size=(5, 3), padding=(2, 1))
+        self.bn9 = nn.BatchNorm2d(64)
+
+        # Capa 10: 5x7, (48+64) -> 64
+        self.conv10 = nn.Conv2d(48 + 64, 64, kernel_size=(5, 7), padding=(2, 3))
+        self.bn10 = nn.BatchNorm2d(64)
+
+        # Capa 11: 7x5, (64+64) -> 64
+        self.conv11 = nn.Conv2d(64 + 64, 64, kernel_size=(7, 5), padding=(3, 2))
+        self.bn11 = nn.BatchNorm2d(64)
+
+        # Capa 12: 3x7, (64+64) -> 64
+        self.conv12 = nn.Conv2d(64 + 64, 64, kernel_size=(3, 7), padding=(1, 3))
+        self.bn12 = nn.BatchNorm2d(64)
+
+        # Capa 13: 7x3, (64+64) -> 64
+        self.conv13 = nn.Conv2d(64 + 64, 64, kernel_size=(7, 3), padding=(3, 1))
+        self.bn13 = nn.BatchNorm2d(64)
+
+        # Capa 14: 5x7, (64+64) -> 64
+        self.conv14 = nn.Conv2d(64 + 64, 64, kernel_size=(5, 7), padding=(2, 3))
+        self.bn14 = nn.BatchNorm2d(64)
+
+        # Capa 15: 7x1, (64+64) -> 64
+        self.conv15 = nn.Conv2d(64 + 64, 64, kernel_size=(7, 1), padding=(3, 0))
+        self.bn15 = nn.BatchNorm2d(64)
+
+        # Clasificador: global average pooling + FC
+        self.fc = nn.Linear(64, num_classes)
+
+        # Activación final sólo para .predict()
+        self.final_activation = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        # C1, C2
+        x1 = F.relu(self.bn1(self.conv1(x)))        # [B, 36, 32, 32]
+        x2 = F.relu(self.bn2(self.conv2(x1)))       # [B, 48, 32, 32]
+
+        # C3
+        x3_in = torch.cat([x1, x2], dim=1)
+        x3 = F.relu(self.bn3(self.conv3(x3_in)))    # [B, 36, 32, 32]
+
+        # C4
+        x4_in = torch.cat([x2, x3], dim=1)
+        x4 = F.relu(self.bn4(self.conv4(x4_in)))    # [B, 36, 32, 32]
+
+        # C5
+        x5_in = torch.cat([x3, x4], dim=1)
+        x5 = F.relu(self.bn5(self.conv5(x5_in)))    # [B, 48, 32, 32]
+
+        # C6
+        x6_in = torch.cat([x4, x5], dim=1)
+        x6 = F.relu(self.bn6(self.conv6(x6_in)))    # [B, 36, 32, 32]
+
+        # C7
+        x7_in = torch.cat([x5, x6], dim=1)
+        x7 = F.relu(self.bn7(self.conv7(x7_in)))    # [B, 48, 32, 32]
+
+        # C8
+        x8_in = torch.cat([x6, x7], dim=1)
+        x8 = F.relu(self.bn8(self.conv8(x8_in)))    # [B, 48, 32, 32]
+
+        # C9
+        x9_in = torch.cat([x7, x8], dim=1)
+        x9 = F.relu(self.bn9(self.conv9(x9_in)))    # [B, 64, 32, 32]
+
+        # C10
+        x10_in = torch.cat([x8, x9], dim=1)
+        x10 = F.relu(self.bn10(self.conv10(x10_in)))  # [B, 64, 32, 32]
+
+        # C11
+        x11_in = torch.cat([x9, x10], dim=1)
+        x11 = F.relu(self.bn11(self.conv11(x11_in)))  # [B, 64, 32, 32]
+
+        # C12
+        x12_in = torch.cat([x10, x11], dim=1)
+        x12 = F.relu(self.bn12(self.conv12(x12_in)))  # [B, 64, 32, 32]
+
+        # C13
+        x13_in = torch.cat([x11, x12], dim=1)
+        x13 = F.relu(self.bn13(self.conv13(x13_in)))  # [B, 64, 32, 32]
+
+        # C14
+        x14_in = torch.cat([x12, x13], dim=1)
+        x14 = F.relu(self.bn14(self.conv14(x14_in)))  # [B, 64, 32, 32]
+
+        # C15
+        x15_in = torch.cat([x13, x14], dim=1)
+        x15 = F.relu(self.bn15(self.conv15(x15_in)))  # [B, 64, 32, 32]
+
+        # Global Average Pooling + FC
+        out = F.adaptive_avg_pool2d(x15, output_size=1)  # [B, 64, 1, 1]
+        out = out.view(out.size(0), -1)                  # [B, 64]
+        out = self.fc(out)                               # [B, num_classes]
+        return out
+
+    def predict(self, x):
+        """
+        Devuelve probabilidades (softmax) a partir de logits.
+        Útil para evaluación/inferencia; para entrenamiento usar los logits con
+        nn.CrossEntropyLoss.
+        """
+        logits = self.forward(x)
+        return self.final_activation(logits)

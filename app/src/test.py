@@ -80,7 +80,6 @@ def run_cifar101_evaluation(
             results["predictions"],
             results["labels"],
             CLASS_NAMES,
-            dataset_name="CIFAR-10.1",
         )
 
         log("\n5. Mostrando ejemplos de predicciones...")

@@ -6,6 +6,7 @@ from os import makedirs, path
 import numpy as np
 import torchvision.datasets as datasets
 from torch.utils.data import DataLoader, Dataset
+from .pre_processed import config_augmentation
 
 from .pre_processed import TransformConfig, build_transforms, compute_dataset_stats
 
@@ -83,16 +84,16 @@ def load_cifar10(
     config = config or TransformConfig()
 
     mean, std = compute_dataset_stats(datasets_folder)
-    train_transform, val_transform = build_transforms(mean, std, config)
+    training_transformations, test_transformations = build_transforms(mean, std, config)
 
     train_dataset = datasets.CIFAR10(
-        datasets_folder, train=True, download=True, transform=train_transform
+        datasets_folder, train=True, download=True, transform=training_transformations
     )
     val_dataset = datasets.CIFAR10(
-        datasets_folder, train=False, download=True, transform=val_transform
+        datasets_folder, train=False, download=True, transform=test_transformations
     )
 
-    return train_dataset, val_dataset
+    return train_dataset, val_dataset, training_transformations, test_transformations
 
 
 def load_cifar101(
