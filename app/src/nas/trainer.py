@@ -52,6 +52,14 @@ class NASTrainer:
         self.best_architecture = None
         self.best_reward = 0.0
         self.episode_count = 0
+        self.total_architectures_evaluated = 0
+        
+        # Layer schedule (incremental depth)
+        self.layer_schedule_enabled = config.get('layer_schedule', False)
+        self.current_num_layers = config.get('max_layers', 3)
+        self.layer_increment = config.get('layer_increment', 2)
+        self.increment_every = config.get('increment_every', 1600)
+        self.max_layer_limit = config.get('max_layer_limit', 15)
         
         # Paths
         self.checkpoint_dir = Path(config.get('checkpoint_dir', 'checkpoints/nas'))
@@ -140,15 +148,18 @@ class NASTrainer:
                 level='ARCHITECTURE'
             )
             
-            # Training configuration
+            # Training configuration (según paper Zoph & Le 2017)
             child_config = {
                 'experiment_name': f'nas_child_{child_id}',
-                'lr': self.config.get('child_lr', 3e-5),
-                'epochs': self.config.get('child_epochs', 100),
-                'batch_size': self.config.get('child_batch_size', 20),
-                'optimizer': 'Adam',
+                'lr': self.config.get('child_lr', 0.1),
+                'epochs': self.config.get('child_epochs', 50),
+                'batch_size': self.config.get('child_batch_size', 128),
+                'optimizer': self.config.get('child_optimizer', 'SGD'),
+                'momentum': self.config.get('child_momentum', 0.9),
+                'weight_decay': self.config.get('child_weight_decay', 1e-4),
+                'nesterov': self.config.get('child_nesterov', True),
                 'es_patience': 10,
-                'use_scheduler': True,
+                'lr_scheduler': True,
                 'lr_patience': 5,
                 'checkpoint_dir': str(self.checkpoint_dir / 'children' / child_id),
                 'experiment_dir': str(self.checkpoint_dir / 'children' / child_id),
@@ -159,12 +170,26 @@ class NASTrainer:
             pipeline = TrainingPipeline(model, child_config)
             pipeline.train(train_loader, val_loader)
             
-            # Retrieve best validation accuracy
-            reward = pipeline.best_val_acc
+            # Calculate reward according to paper: max validation accuracy of last K epochs, cubed
+            reward_top_k = self.config.get('reward_top_k', 5)
+            reward_power = self.config.get('reward_power', 3)
+            
+            # Get last K validation accuracies
+            if len(pipeline.val_metrics) >= reward_top_k:
+                last_k_accs = pipeline.val_metrics[-reward_top_k:]
+            else:
+                last_k_accs = pipeline.val_metrics
+            
+            # Max accuracy of last K epochs
+            max_acc = max(last_k_accs) if last_k_accs else 0.0
+            
+            # Reward = (max_acc)^power (según paper: al cubo)
+            reward = max_acc ** reward_power
             
             self._log(
                 f"Child {child_id} - Training completed: "
-                f"Best Val Acc = {reward:.4f}",
+                f"Max Val Acc (last {reward_top_k} epochs) = {max_acc:.4f}, "
+                f"Reward = {reward:.6f}",
                 level='REWARD'
             )
             
@@ -223,8 +248,42 @@ class NASTrainer:
             episode_rewards = []
             episode_architectures = []
             
+            # Layer schedule: increase depth progressively
+            if self.layer_schedule_enabled and self.total_architectures_evaluated > 0:
+                if self.total_architectures_evaluated % self.increment_every == 0:
+                    if self.current_num_layers < self.max_layer_limit:
+                        self.current_num_layers = min(
+                            self.current_num_layers + self.layer_increment,
+                            self.max_layer_limit
+                        )
+                        self._log("")
+                        self._log(
+                            f"🔼 LAYER SCHEDULE: Increasing depth to {self.current_num_layers} layers "
+                            f"(after {self.total_architectures_evaluated} architectures)",
+                            level='SUCCESS'
+                        )
+                        self._log("")
+                        
+                        # Recreate controller with new layer count
+                        self.controller = NASController(
+                            num_layers=self.current_num_layers,
+                            components_per_layer=self.config.get('components_per_layer', 4),
+                            hidden_size=self.config.get('lstm_hidden_size', 35),
+                            device=self.device
+                        )
+                        # Recreate optimizer with new controller
+                        self.reinforce = REINFORCEOptimizer(
+                            self.controller,
+                            lr=self.config.get('controller_lr', 0.0006),
+                            decay=self.config.get('lr_decay', 0.96),
+                            decay_steps=self.config.get('lr_decay_steps', 500),
+                            beta=self.config.get('beta', 1e-4),
+                            ema_alpha=self.config.get('baseline_ema_alpha', 0.95)
+                        )
+            
             self._log("")
             self._log(f"━━━ EPISODE {self.episode_count}/{num_episodes} ━━━", level='STEP')
+            self._log(f"Current depth: {self.current_num_layers} layers")
             self._log(f"Generating and evaluating {children_per_episode} architectures...")
             
             # Generar y evaluar children
@@ -235,6 +294,8 @@ class NASTrainer:
                     dna_flat.tolist(), 
                     components_per_layer=self.config.get('components_per_layer', 4)
                 )
+                
+                self.total_architectures_evaluated += 1
                 
                 # Train child
                 child_id = f"ep{self.episode_count}_child{child_idx + 1}"

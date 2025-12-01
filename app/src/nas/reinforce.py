@@ -21,7 +21,7 @@ class REINFORCEOptimizer:
     def __init__(
         self,
         controller,
-        lr: float = 0.99,
+        lr: float = 0.0006,
         decay: float = 0.96,
         decay_steps: int = 500,
         beta: float = 1e-4,
@@ -30,7 +30,7 @@ class REINFORCEOptimizer:
         """
         Args:
             controller: NASController instance
-            lr: Initial learning rate
+            lr: Initial learning rate (paper usa 0.0006 con ADAM)
             decay: Decay factor
             decay_steps: Steps between decay applications
             beta: L2 regularization weight
@@ -40,8 +40,8 @@ class REINFORCEOptimizer:
         self.beta = beta
         self.ema_alpha = ema_alpha
         
-        # Optimizer
-        self.optimizer = optim.RMSprop(
+        # Optimizer (según paper: ADAM con lr=0.0006)
+        self.optimizer = optim.Adam(
             controller.parameters(),
             lr=lr
         )

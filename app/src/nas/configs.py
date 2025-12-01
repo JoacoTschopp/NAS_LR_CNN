@@ -93,6 +93,86 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
             
             'checkpoint_dir': 'checkpoints/nas_thorough',
             'log_dir': 'logs/nas_thorough',
+        },
+        
+        'nascnn15': {
+            # Configuration based on NAS paper (Zoph & Le 2017)
+            # Replica los hiperparámetros del paper para CIFAR-10
+            
+            # Controller parameters (según paper: 2-layer LSTM, 35 hidden units, ADAM lr=0.0006)
+            'max_layers': 6,  # Empieza en 6, aumentará progresivamente
+            'layer_schedule': True,  # Activar schedule de capas progresivo
+            'layer_increment': 2,  # Aumentar 2 capas cada vez
+            'increment_every': 1600,  # Cada 1,600 arquitecturas
+            'max_layer_limit': 15,  # Límite máximo (NASCNN15)
+            
+            'components_per_layer': 4,
+            'lstm_hidden_size': 35,  # Según paper
+            'controller_lr': 0.0006,  # Según paper (ADAM)
+            'lr_decay': 0.96,
+            'lr_decay_steps': 1000,
+            'beta': 1e-4,
+            'baseline_ema_alpha': 0.95,
+            
+            # Child Network parameters (según paper)
+            'child_optimizer': 'SGD',  # SGD + Momentum + Nesterov
+            'child_lr': 0.1,  # Según paper
+            'child_momentum': 0.9,  # Según paper
+            'child_nesterov': True,  # Según paper
+            'child_weight_decay': 1e-4,  # Según paper
+            'child_epochs': 50,  # Según paper
+            'child_batch_size': 128,  # Batch size estándar para CIFAR-10
+            'child_dropout': 0.0,  # Sin dropout en las capas
+            'reward_top_k': 5,  # Max accuracy de últimas 5 épocas
+            'reward_power': 3,  # Elevar al cubo
+            
+            # NAS Search parameters (según paper: 12,800 total architectures)
+            'max_episodes': 1280,  # 12,800 / 10 = 1,280 episodes
+            'children_per_episode': 10,
+            'save_every': 50,
+            
+            'checkpoint_dir': 'checkpoints/nas_nascnn15',
+            'log_dir': 'logs/nas_nascnn15',
+        },
+        
+        'demo': {
+            # Configuration para DEMO/PRUEBA del proceso NAS
+            # Simula el paper pero con parámetros reducidos para viabilidad computacional
+            
+            # Controller parameters (igual que paper)
+            'max_layers': 6,  # Empieza en 6
+            'layer_schedule': True,  # Activar schedule progresivo
+            'layer_increment': 2,  # +2 capas cada vez
+            'increment_every': 12,  # Cada 12 arquitecturas (en lugar de 1,600)
+            'max_layer_limit': 12,  # Límite: 12 capas (en lugar de 15)
+            
+            'components_per_layer': 4,
+            'lstm_hidden_size': 35,  # Según paper
+            'controller_lr': 0.0006,  # Según paper
+            'lr_decay': 0.96,
+            'lr_decay_steps': 100,
+            'beta': 1e-4,
+            'baseline_ema_alpha': 0.95,
+            
+            # Child Network parameters (según paper pero con menos épocas)
+            'child_optimizer': 'SGD',
+            'child_lr': 0.1,
+            'child_momentum': 0.9,
+            'child_nesterov': True,
+            'child_weight_decay': 1e-4,
+            'child_epochs': 10,  # 10 épocas (en lugar de 50) para demo
+            'child_batch_size': 128,
+            'child_dropout': 0.0,
+            'reward_top_k': 3,  # Max de últimas 3 épocas (en lugar de 5)
+            'reward_power': 3,  # Al cubo
+            
+            # NAS Search parameters (reducido para demo)
+            'max_episodes': 10,  # 10 episodes
+            'children_per_episode': 3,  # 3 arquitecturas por episode = 30 total
+            'save_every': 5,
+            
+            'checkpoint_dir': 'checkpoints/nas_demo',
+            'log_dir': 'logs/nas_demo',
         }
     }
     
@@ -102,12 +182,12 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
     return configs[config_name]
 
 
-# DNA component limits
+# DNA component limits (según paper Zoph & Le 2017)
 DNA_LIMITS = {
-    'kernel_size': (1, 7),      # Min: 1x1, Max: 7x7
-    'num_filters': (32, 512),   # Min: 32, Max: 512 filters
-    'stride': (1, 2),           # 1 or 2
-    'pool_size': (1, 3),        # 1 (no pool), 2 or 3
+    'kernel_size': (1, 7),      # [1, 3, 5, 7] - filter height/width
+    'num_filters': (24, 64),    # [24, 36, 48, 64] - según paper
+    'stride': (1, 1),           # stride=1 fijo (experimento sin stride variable)
+    'pool_size': (1, 1),        # sin pooling en este experimento
 }
 
 

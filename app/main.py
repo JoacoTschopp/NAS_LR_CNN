@@ -6,11 +6,14 @@ Este script proporciona dos modos de operación:
     2. NASCNN15 Training: Entrenamiento completo de NASCNN15
 
 Uso:
+    # Demo NAS (simula paper con 30 arquitecturas, schedule progresivo, logs completos)
+    python main.py --mode nas --config demo
+    
     # Búsqueda NAS (modo rápido para pruebas)
     python main.py --mode nas --config fast --episodes 10 --children 3
     
-    # Búsqueda NAS (modo completo)
-    python main.py --mode nas --config default
+    # Búsqueda NAS completa del paper (12,800 arquitecturas)
+    python main.py --mode nas --config nascnn15
     
     # Entrenamiento NASCNN15
     python main.py --mode train
@@ -381,8 +384,8 @@ def main():
         '--config',
         type=str,
         default='fast',
-        choices=['default', 'fast', 'thorough'],
-        help='Configuración de NAS (default: fast)'
+        choices=['default', 'fast', 'thorough', 'nascnn15', 'demo'],
+        help='Configuración de NAS. "demo" simula el paper con parámetros reducidos. "nascnn15" es búsqueda completa.'
     )
     nas_group.add_argument(
         '--episodes',

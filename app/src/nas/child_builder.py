@@ -6,8 +6,23 @@ DNA encodes architectures as lists of [kernel, filters, stride, pool].
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 from .utils import validate_dna, clip_dna
+
+
+class ChildNetwork(nn.Module):
+    """
+    Wrapper para modelos child que añade el atributo final_activation
+    requerido por TrainingPipeline.
+    """
+    def __init__(self, layers):
+        super().__init__()
+        self.layers = layers
+        self.final_activation = nn.Softmax(dim=1)
+    
+    def forward(self, x):
+        return self.layers(x)
 
 
 class ChildNetworkBuilder:
@@ -56,11 +71,15 @@ class ChildNetworkBuilder:
             stride = int(stride)
             pool = int(pool)
             
-            # Enforce sane limits just in case
+            # Enforce limits according to paper (Zoph & Le 2017)
+            # Kernels: [1, 3, 5, 7]
             kernel = max(1, min(7, kernel))
-            filters = max(32, min(512, filters))
-            stride = max(1, min(2, stride))
-            pool = max(1, min(3, pool))
+            # Filters: [24, 36, 48, 64]
+            filters = max(24, min(64, filters))
+            # Stride: 1 (fixed in paper's CIFAR-10 experiment)
+            stride = 1
+            # Pool: sin pooling en este experimento
+            pool = 1
             
             # Force odd kernel size for symmetric padding
             if kernel % 2 == 0:
@@ -102,7 +121,10 @@ class ChildNetworkBuilder:
         layers.append(nn.Linear(in_channels, num_classes))
         
         # Build sequential model
-        model = nn.Sequential(*layers)
+        sequential_model = nn.Sequential(*layers)
+        
+        # Wrap in ChildNetwork to add final_activation attribute
+        model = ChildNetwork(sequential_model)
         
         return model
     

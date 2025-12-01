@@ -772,27 +772,34 @@ class TrainingPipeline:
     
     # Function to Convert to ONNX 
     def _convert_onnx(self): 
+        """
+        Convierte el modelo a formato ONNX (opcional).
+        Si falla por dependencias faltantes, se salta silenciosamente.
+        """
+        try:
+            # Seteamos el modelo en modo inferencia
+            self.model.eval() 
 
-        # Seteamos el modelo en modo inferencia
-        self.model.eval() 
+            # Creamos un tensor de entrada dummy en el mismo device que el modelo
+            dummy_input = torch.randn(1, 3, 32, 32, requires_grad=True, device=self.device)
 
-        # Creamos un tensor de entrada dummy en el mismo device que el modelo
-        dummy_input = torch.randn(1, 3, 32, 32, requires_grad=True, device=self.device)
+            # Donde guardamos el modelo
+            model_path = os.path.join(self.results_dir, "ImageClassifier.onnx")
 
-        # Donde guardamos el modelo
-        model_path = os.path.join(self.results_dir, "ImageClassifier.onnx")
-
-        # Exportamos el modelo   
-        torch.onnx.export(self.model,         # modelo a exportar 
-         dummy_input,       # input (or a tuple for multiple inputs) 
-         model_path,       # donde guardamos el modelo  
-         export_params=True,  # guardar los parámetros del modelo 
-         opset_version=10,    # version de ONNX 
-         do_constant_folding=True,  # optimización 
-         input_names = ['modelInput'],   # nombres de los inputs 
-         output_names = ['modelOutput'], # nombres de los outputs 
-         dynamic_axes={'modelInput' : {0 : 'batch_size'},    # axes con longitud variable 
-                                'modelOutput' : {0 : 'batch_size'}}) 
+            # Exportamos el modelo   
+            torch.onnx.export(self.model,         # modelo a exportar 
+             dummy_input,       # input (or a tuple for multiple inputs) 
+             model_path,       # donde guardamos el modelo  
+             export_params=True,  # guardar los parámetros del modelo 
+             opset_version=10,    # version de ONNX 
+             do_constant_folding=True,  # optimización 
+             input_names = ['modelInput'],   # nombres de los inputs 
+             output_names = ['modelOutput'], # nombres de los outputs 
+             dynamic_axes={'modelInput' : {0 : 'batch_size'},    # axes con longitud variable 
+                                    'modelOutput' : {0 : 'batch_size'}})
+        except Exception as e:
+            # Si falla (ej: falta onnxscript), no es crítico - simplemente no exportamos
+            pass 
 
 
 print("✓ Clase TrainingPipeline cargada exitosamente")
