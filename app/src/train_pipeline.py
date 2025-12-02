@@ -218,7 +218,7 @@ class TrainingPipeline:
                     self.best_epoch = epoch
                     patience_counter = 0
                     self.save_checkpoint('best_model.pth', is_best=True)
-                    print(" ✓ MEJOR", end="")
+                    print(" MEJOR", end="")
                 else:
                     patience_counter += 1
 
@@ -255,7 +255,7 @@ class TrainingPipeline:
 
         # Cargar mejor modelo
         self.load_checkpoint('best_model.pth')
-        print(f"\n✓ Mejor modelo cargado automáticamente")
+        print("\nMejor modelo cargado automáticamente")
 
     def save_checkpoint(self, filename, is_best=False):
         """Guarda checkpoint del estado actual"""
@@ -273,7 +273,7 @@ class TrainingPipeline:
             'config': self.config
         }
         torch.save(checkpoint, filepath)
-        self._convert_onnx()
+        # self._convert_onnx()  # Comentado: conversión a ONNX deshabilitada
 
     def load_checkpoint(self, filename):
         """Carga checkpoint desde archivo"""
@@ -294,7 +294,7 @@ class TrainingPipeline:
         self.val_losses = checkpoint['val_losses']
         self.val_metrics = checkpoint['val_metrics']
 
-        print(f"✓ Checkpoint cargado: {filename}")
+        print(f"Checkpoint cargado: {filename}")
         print(f"  Época: {self.current_epoch}, Acc: {self.best_val_acc:.2%}")
         return True
 
@@ -504,7 +504,7 @@ class TrainingPipeline:
         with open(self.experiments_log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(experiment_record, ensure_ascii=False) + "\n")
 
-        print(f"✓ Experimento registrado en: {self.experiments_log_path}")
+        print(f"Experimento registrado en: {self.experiments_log_path}")
         print(f"  id={self.experiment_id} | nombre={self.experiment_name}")
 
         # ------------------------------------------------------------------
@@ -553,7 +553,7 @@ class TrainingPipeline:
                 f.write(val_tf_str)
                 f.write("\n```\n")
 
-            print(f"✓ Resumen Markdown guardado en: {md_path}")
+            print(f"Resumen Markdown guardado en: {md_path}")
 
         return experiment_record
 
@@ -802,4 +802,4 @@ class TrainingPipeline:
             pass 
 
 
-print("✓ Clase TrainingPipeline cargada exitosamente")
+print("Clase TrainingPipeline cargada exitosamente")

@@ -59,7 +59,7 @@ def draw_model(model: nn.Module, output_dir=None):
         output_path.mkdir(parents=True, exist_ok=True)
         file_path = output_path / "model.png"
         model_graph.visual_graph.save(file_path)
-        print(f"✓ Arquitectura guardada en {file_path}")
+        print(f"Arquitectura guardada en {file_path}")
     return model_graph.visual_graph
 
 
@@ -67,15 +67,15 @@ def que_fierro_tengo():
     """Detecta y muestra el dispositivo disponible (GPU/CPU)"""
     if torch.cuda.is_available():
         device = torch.device("cuda")
-        print(f"✓ GPU NVIDIA disponible: {torch.cuda.get_device_name(0)}")
+        print(f"GPU NVIDIA disponible: {torch.cuda.get_device_name(0)}")
     elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         device = torch.device("mps")
-        print("✓ GPU Apple Silicon (MPS) disponible")
+        print("GPU Apple Silicon (MPS) disponible")
     else:
         device = torch.device("cpu")
-        print("✓ Usando CPU")
+        print("Usando CPU")
 
     # Crear un tensor de prueba
     test_tensor = torch.randn(10, 10).to(device)
-    print(f"✓ Tensor de prueba creado en: {test_tensor.device}")
+    print(f"Tensor de prueba creado en: {test_tensor.device}")
     return device

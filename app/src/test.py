@@ -43,7 +43,7 @@ def run_cifar10_test_evaluation(
         shuffle=False
     )
     
-    print(f"✓ {len(test_dataset)} imágenes de test preprocesadas")
+    print(f"{len(test_dataset)} imágenes de test preprocesadas")
     
     # Evaluar modelo
     results = pipeline.evaluate(test_dataloader, dataset_name="CIFAR-10 Test")

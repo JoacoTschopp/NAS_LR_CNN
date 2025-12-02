@@ -95,21 +95,21 @@ class NASTrainer:
         
         # Prefix per log level
         prefixes = {
-            'INFO': '📋',
-            'SUCCESS': '✅',
-            'STEP': '🔹',
-            'METRIC': '📊',
-            'ERROR': '❌',
-            'ARCHITECTURE': '🏗️',
-            'TRAINING': '🎯',
-            'REWARD': '🏆',
+            'INFO': 'INFO',
+            'SUCCESS': 'SUCCESS',
+            'STEP': 'STEP',
+            'METRIC': 'METRIC',
+            'ERROR': 'ERROR',
+            'ARCHITECTURE': 'ARCHITECTURE',
+            'TRAINING': 'TRAINING',
+            'REWARD': 'REWARD',
         }
         
-        prefix = prefixes.get(level, '  ')
-        log_message = f"[{timestamp}] {prefix} {message}"
+        prefix = prefixes.get(level, 'LOG')
+        log_message = f"[{timestamp}] [{prefix}] {message}"
         print(log_message)
         
-        with open(self.log_file, 'a') as f:
+        with open(self.log_file, 'a', encoding='utf-8') as f:
             f.write(log_message + '\n')
     
     def _train_child(
@@ -258,7 +258,7 @@ class NASTrainer:
                         )
                         self._log("")
                         self._log(
-                            f"🔼 LAYER SCHEDULE: Increasing depth to {self.current_num_layers} layers "
+                            f"LAYER SCHEDULE: Increasing depth to {self.current_num_layers} layers "
                             f"(after {self.total_architectures_evaluated} architectures)",
                             level='SUCCESS'
                         )

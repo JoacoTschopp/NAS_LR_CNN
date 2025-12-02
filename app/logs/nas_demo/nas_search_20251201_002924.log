@@ -1,0 +1,393 @@
+[2025-12-01 00:29:24] [INFO] NAS Trainer initialized on device: cuda
+[2025-12-01 00:29:24] [INFO] Controller parameters: 6,184
+[2025-12-01 00:29:24] [INFO] ======================================================================
+[2025-12-01 00:29:24] [INFO] STARTING NEURAL ARCHITECTURE SEARCH
+[2025-12-01 00:29:24] [INFO] ======================================================================
+[2025-12-01 00:29:24] [INFO] 
+[2025-12-01 00:29:24] [STEP] SEARCH CONFIGURATION:
+[2025-12-01 00:29:24] [INFO]   • Total episodes: 10
+[2025-12-01 00:29:24] [INFO]   • Architectures per episode: 3
+[2025-12-01 00:29:24] [INFO]   • Total architectures to evaluate: 30
+[2025-12-01 00:29:24] [INFO]   • Compute device: cuda
+[2025-12-01 00:29:24] [INFO]   • Checkpoint frequency: every 5 episodes
+[2025-12-01 00:29:24] [INFO]   • Layers per architecture: 6
+[2025-12-01 00:29:24] [INFO]   • Training epochs per child: 10
+[2025-12-01 00:29:24] [INFO] 
+[2025-12-01 00:29:24] [STEP] PROCESS OVERVIEW:
+[2025-12-01 00:29:24] [INFO]   1. Controller (LSTM) generates architecture DNA
+[2025-12-01 00:29:24] [INFO]   2. DNA is decoded into a CNN architecture
+[2025-12-01 00:29:24] [INFO]   3. Child Network is trained on CIFAR-10
+[2025-12-01 00:29:24] [INFO]   4. Validation accuracy becomes the reward
+[2025-12-01 00:29:24] [INFO]   5. Controller is updated with REINFORCE
+[2025-12-01 00:29:24] [INFO] ======================================================================
+[2025-12-01 00:29:24] [INFO] 
+[2025-12-01 00:29:24] [STEP] ━━━ EPISODE 1/10 ━━━
+[2025-12-01 00:29:24] [INFO] Current depth: 6 layers
+[2025-12-01 00:29:24] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 00:29:24] [INFO] 
+[2025-12-01 00:29:24] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 00:29:24] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 19, 4, 3]
+[2025-12-01 00:29:24] [ARCHITECTURE] Child ep1_child1 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 00:34:39] [REWARD] Child ep1_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.7320, Reward = 0.392223
+[2025-12-01 00:34:39] [INFO] 
+[2025-12-01 00:34:39] [SUCCESS] NEW BEST ARCHITECTURE FOUND! Reward: 0.3922
+[2025-12-01 00:34:39] [INFO] DNA Architecture:
+--------------------------------------------------
+Layer 1: K=1x1, F=3, S=19, P=12x12
+Layer 2: K=23x23, F=26, S=7, P=11x11
+Layer 3: K=4x4, F=9, S=5, P=4x4
+Layer 4: K=16x16, F=10, S=1, P=1x1
+Layer 5: K=7x7, F=3, S=13, P=10x10
+Layer 6: K=9x9, F=19, S=4, P=3x3
+[2025-12-01 00:34:39] [INFO] This architecture outperforms all previous ones.
+[2025-12-01 00:34:39] [SUCCESS] Best architecture saved: checkpoints\nas_demo\best_architecture.json
+[2025-12-01 00:34:39] [INFO] 
+[2025-12-01 00:34:39] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 00:34:39] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 19, 4, 3]
+[2025-12-01 00:34:39] [ARCHITECTURE] Child ep1_child2 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 00:39:46] [REWARD] Child ep1_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7308, Reward = 0.390297
+[2025-12-01 00:39:46] [INFO] 
+[2025-12-01 00:39:46] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 00:39:46] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 19, 4, 3]
+[2025-12-01 00:39:46] [ARCHITECTURE] Child ep1_child3 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 00:44:54] [REWARD] Child ep1_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7108, Reward = 0.359122
+[2025-12-01 00:44:54] [INFO] 
+[2025-12-01 00:44:54] [METRIC] ━━━ EPISODE 1 SUMMARY ━━━
+[2025-12-01 00:44:54] [INFO]   • Mean reward: 0.3805 ± 0.0152
+[2025-12-01 00:44:54] [INFO]   • Best child this episode: 0.3922
+[2025-12-01 00:44:54] [INFO]   • Worst child this episode: 0.3591
+[2025-12-01 00:44:54] [INFO]   • Baseline EMA: 0.3805
+[2025-12-01 00:44:54] [INFO]   • Global best architecture: 0.3922
+[2025-12-01 00:44:54] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 00:44:54] [INFO]   • Mean advantage: -0.0000
+[2025-12-01 00:44:54] [INFO] 
+  Progress: 1/10 (10.0%)
+[2025-12-01 00:44:54] [INFO] 
+[2025-12-01 00:44:54] [STEP] ━━━ EPISODE 2/10 ━━━
+[2025-12-01 00:44:54] [INFO] Current depth: 6 layers
+[2025-12-01 00:44:54] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 00:44:54] [INFO] 
+[2025-12-01 00:44:54] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 00:44:54] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 18, 4, 3]
+[2025-12-01 00:44:54] [ARCHITECTURE] Child ep2_child1 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 00:50:03] [REWARD] Child ep2_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.7152, Reward = 0.365833
+[2025-12-01 00:50:03] [INFO] 
+[2025-12-01 00:50:03] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 00:50:03] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 18, 4, 3]
+[2025-12-01 00:50:03] [ARCHITECTURE] Child ep2_child2 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 00:55:10] [REWARD] Child ep2_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.6926, Reward = 0.332237
+[2025-12-01 00:55:10] [INFO] 
+[2025-12-01 00:55:10] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 00:55:10] [INFO] DNA: [1, 3, 19, 12, 23, 26, 7, 11, 4, 9, 5, 4, 16, 10, 1, 1, 7, 3, 13, 10, 9, 18, 4, 3]
+[2025-12-01 00:55:10] [ARCHITECTURE] Child ep2_child3 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:00:16] [REWARD] Child ep2_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7310, Reward = 0.390618
+[2025-12-01 01:00:16] [INFO] 
+[2025-12-01 01:00:16] [METRIC] ━━━ EPISODE 2 SUMMARY ━━━
+[2025-12-01 01:00:16] [INFO]   • Mean reward: 0.3629 ± 0.0239
+[2025-12-01 01:00:16] [INFO]   • Best child this episode: 0.3906
+[2025-12-01 01:00:16] [INFO]   • Worst child this episode: 0.3322
+[2025-12-01 01:00:16] [INFO]   • Baseline EMA: 0.3797
+[2025-12-01 01:00:16] [INFO]   • Global best architecture: 0.3922
+[2025-12-01 01:00:16] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 01:00:16] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 01:00:16] [INFO] 
+  Progress: 2/10 (20.0%)
+[2025-12-01 01:00:16] [INFO] 
+[2025-12-01 01:00:16] [STEP] ━━━ EPISODE 3/10 ━━━
+[2025-12-01 01:00:16] [INFO] Current depth: 6 layers
+[2025-12-01 01:00:16] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 01:00:16] [INFO] 
+[2025-12-01 01:00:16] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 01:00:16] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 16, 10, 1, 1, 8, 2, 12, 10, 9, 18, 4, 3]
+[2025-12-01 01:00:16] [ARCHITECTURE] Child ep3_child1 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:05:22] [REWARD] Child ep3_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.7394, Reward = 0.404239
+[2025-12-01 01:05:22] [INFO] 
+[2025-12-01 01:05:22] [SUCCESS] NEW BEST ARCHITECTURE FOUND! Reward: 0.4042
+[2025-12-01 01:05:22] [INFO] DNA Architecture:
+--------------------------------------------------
+Layer 1: K=1x1, F=2, S=19, P=11x11
+Layer 2: K=23x23, F=26, S=7, P=10x10
+Layer 3: K=4x4, F=8, S=5, P=4x4
+Layer 4: K=16x16, F=10, S=1, P=1x1
+Layer 5: K=8x8, F=2, S=12, P=10x10
+Layer 6: K=9x9, F=18, S=4, P=3x3
+[2025-12-01 01:05:22] [INFO] This architecture outperforms all previous ones.
+[2025-12-01 01:05:22] [SUCCESS] Best architecture saved: checkpoints\nas_demo\best_architecture.json
+[2025-12-01 01:05:22] [INFO] 
+[2025-12-01 01:05:22] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 01:05:22] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 16, 10, 1, 1, 8, 2, 12, 10, 9, 18, 4, 3]
+[2025-12-01 01:05:22] [ARCHITECTURE] Child ep3_child2 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:10:29] [REWARD] Child ep3_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7010, Reward = 0.344472
+[2025-12-01 01:10:29] [INFO] 
+[2025-12-01 01:10:29] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 01:10:29] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 16, 10, 1, 1, 8, 2, 12, 10, 9, 18, 4, 3]
+[2025-12-01 01:10:29] [ARCHITECTURE] Child ep3_child3 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:15:34] [REWARD] Child ep3_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7146, Reward = 0.364913
+[2025-12-01 01:15:34] [INFO] 
+[2025-12-01 01:15:34] [METRIC] ━━━ EPISODE 3 SUMMARY ━━━
+[2025-12-01 01:15:34] [INFO]   • Mean reward: 0.3712 ± 0.0248
+[2025-12-01 01:15:34] [INFO]   • Best child this episode: 0.4042
+[2025-12-01 01:15:34] [INFO]   • Worst child this episode: 0.3445
+[2025-12-01 01:15:34] [INFO]   • Baseline EMA: 0.3792
+[2025-12-01 01:15:34] [INFO]   • Global best architecture: 0.4042
+[2025-12-01 01:15:34] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 01:15:34] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 01:15:34] [INFO] 
+  Progress: 3/10 (30.0%)
+[2025-12-01 01:15:34] [INFO] 
+[2025-12-01 01:15:34] [STEP] ━━━ EPISODE 4/10 ━━━
+[2025-12-01 01:15:34] [INFO] Current depth: 6 layers
+[2025-12-01 01:15:34] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 01:15:34] [INFO] 
+[2025-12-01 01:15:34] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 01:15:34] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 15, 9, 1, 1, 8, 2, 12, 10, 10, 18, 3, 3]
+[2025-12-01 01:15:34] [ARCHITECTURE] Child ep4_child1 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:20:41] [REWARD] Child ep4_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.7120, Reward = 0.360944
+[2025-12-01 01:20:41] [INFO] 
+[2025-12-01 01:20:41] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 01:20:41] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 15, 9, 1, 1, 8, 2, 12, 10, 10, 18, 3, 3]
+[2025-12-01 01:20:41] [ARCHITECTURE] Child ep4_child2 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:25:49] [REWARD] Child ep4_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7464, Reward = 0.415829
+[2025-12-01 01:25:49] [INFO] 
+[2025-12-01 01:25:49] [SUCCESS] NEW BEST ARCHITECTURE FOUND! Reward: 0.4158
+[2025-12-01 01:25:49] [INFO] DNA Architecture:
+--------------------------------------------------
+Layer 1: K=1x1, F=2, S=19, P=11x11
+Layer 2: K=23x23, F=26, S=7, P=10x10
+Layer 3: K=4x4, F=8, S=5, P=4x4
+Layer 4: K=15x15, F=9, S=1, P=1x1
+Layer 5: K=8x8, F=2, S=12, P=10x10
+Layer 6: K=10x10, F=18, S=3, P=3x3
+[2025-12-01 01:25:49] [INFO] This architecture outperforms all previous ones.
+[2025-12-01 01:25:49] [SUCCESS] Best architecture saved: checkpoints\nas_demo\best_architecture.json
+[2025-12-01 01:25:49] [INFO] 
+[2025-12-01 01:25:49] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 01:25:49] [INFO] DNA: [1, 2, 19, 11, 23, 26, 7, 10, 4, 8, 5, 4, 15, 9, 1, 1, 8, 2, 12, 10, 10, 18, 3, 3]
+[2025-12-01 01:25:49] [ARCHITECTURE] Child ep4_child3 - Architecture built: 131,462 parameters, 6 conv layers, 0.50 MB
+[2025-12-01 01:30:55] [REWARD] Child ep4_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7206, Reward = 0.374182
+[2025-12-01 01:30:55] [INFO] 
+[2025-12-01 01:30:55] [METRIC] ━━━ EPISODE 4 SUMMARY ━━━
+[2025-12-01 01:30:55] [INFO]   • Mean reward: 0.3837 ± 0.0234
+[2025-12-01 01:30:55] [INFO]   • Best child this episode: 0.4158
+[2025-12-01 01:30:55] [INFO]   • Worst child this episode: 0.3609
+[2025-12-01 01:30:55] [INFO]   • Baseline EMA: 0.3795
+[2025-12-01 01:30:55] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 01:30:55] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 01:30:55] [INFO]   • Mean advantage: -0.0000
+[2025-12-01 01:30:55] [INFO] 
+  Progress: 4/10 (40.0%)
+[2025-12-01 01:30:55] [INFO] 
+[2025-12-01 01:30:55] [SUCCESS] LAYER SCHEDULE: Increasing depth to 8 layers (after 12 architectures)
+[2025-12-01 01:30:55] [INFO] 
+[2025-12-01 01:30:55] [INFO] 
+[2025-12-01 01:30:55] [STEP] ━━━ EPISODE 5/10 ━━━
+[2025-12-01 01:30:55] [INFO] Current depth: 8 layers
+[2025-12-01 01:30:55] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 01:30:55] [INFO] 
+[2025-12-01 01:30:55] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 01:30:55] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 12, 6, 3, 6, 19, 17, 12, 3, 20, 2, 17, 3, 5, 2, 8, 3, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:30:55] [ARCHITECTURE] Child ep5_child1 - Architecture built: 109,570 parameters, 8 conv layers, 0.42 MB
+[2025-12-01 01:35:52] [REWARD] Child ep5_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.7132, Reward = 0.362772
+[2025-12-01 01:35:52] [INFO] 
+[2025-12-01 01:35:52] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 01:35:52] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 12, 6, 3, 6, 19, 17, 12, 3, 20, 2, 17, 3, 5, 2, 8, 3, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:35:52] [ARCHITECTURE] Child ep5_child2 - Architecture built: 109,570 parameters, 8 conv layers, 0.42 MB
+[2025-12-01 01:40:47] [REWARD] Child ep5_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.6586, Reward = 0.285670
+[2025-12-01 01:40:47] [INFO] 
+[2025-12-01 01:40:47] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 01:40:47] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 12, 6, 3, 6, 19, 17, 12, 3, 20, 2, 17, 3, 5, 2, 8, 3, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:40:47] [ARCHITECTURE] Child ep5_child3 - Architecture built: 109,570 parameters, 8 conv layers, 0.42 MB
+[2025-12-01 01:45:43] [REWARD] Child ep5_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7060, Reward = 0.351896
+[2025-12-01 01:45:43] [INFO] 
+[2025-12-01 01:45:43] [METRIC] ━━━ EPISODE 5 SUMMARY ━━━
+[2025-12-01 01:45:43] [INFO]   • Mean reward: 0.3334 ± 0.0341
+[2025-12-01 01:45:43] [INFO]   • Best child this episode: 0.3628
+[2025-12-01 01:45:43] [INFO]   • Worst child this episode: 0.2857
+[2025-12-01 01:45:43] [INFO]   • Baseline EMA: 0.3334
+[2025-12-01 01:45:43] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 01:45:43] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 01:45:43] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 01:45:43] [INFO] 
+  Progress: 5/10 (50.0%)
+[2025-12-01 01:45:43] [INFO] 
+[2025-12-01 01:45:43] [STEP] Saving checkpoint for episode 5...
+[2025-12-01 01:45:43] [SUCCESS] Checkpoint saved successfully: checkpoints\nas_demo\nas_episode_5.pth
+[2025-12-01 01:45:43] [INFO] 
+[2025-12-01 01:45:43] [STEP] ━━━ EPISODE 6/10 ━━━
+[2025-12-01 01:45:43] [INFO] Current depth: 8 layers
+[2025-12-01 01:45:43] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 01:45:43] [INFO] 
+[2025-12-01 01:45:43] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 01:45:43] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 11, 7, 3, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:45:43] [ARCHITECTURE] Child ep6_child1 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 01:50:37] [REWARD] Child ep6_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.6656, Reward = 0.294876
+[2025-12-01 01:50:37] [INFO] 
+[2025-12-01 01:50:37] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 01:50:37] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 11, 7, 3, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:50:37] [ARCHITECTURE] Child ep6_child2 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 01:55:31] [REWARD] Child ep6_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7176, Reward = 0.369528
+[2025-12-01 01:55:31] [INFO] 
+[2025-12-01 01:55:31] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 01:55:31] [INFO] DNA: [12, 14, 7, 1, 10, 15, 15, 6, 2, 11, 7, 3, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 8, 5, 9, 10, 1, 11]
+[2025-12-01 01:55:31] [ARCHITECTURE] Child ep6_child3 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:00:26] [REWARD] Child ep6_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7306, Reward = 0.389977
+[2025-12-01 02:00:26] [INFO] 
+[2025-12-01 02:00:26] [METRIC] ━━━ EPISODE 6 SUMMARY ━━━
+[2025-12-01 02:00:26] [INFO]   • Mean reward: 0.3515 ± 0.0409
+[2025-12-01 02:00:26] [INFO]   • Best child this episode: 0.3900
+[2025-12-01 02:00:26] [INFO]   • Worst child this episode: 0.2949
+[2025-12-01 02:00:26] [INFO]   • Baseline EMA: 0.3343
+[2025-12-01 02:00:26] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 02:00:26] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 02:00:26] [INFO]   • Mean advantage: -0.0000
+[2025-12-01 02:00:26] [INFO] 
+  Progress: 6/10 (60.0%)
+[2025-12-01 02:00:26] [INFO] 
+[2025-12-01 02:00:26] [STEP] ━━━ EPISODE 7/10 ━━━
+[2025-12-01 02:00:26] [INFO] Current depth: 8 layers
+[2025-12-01 02:00:26] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 02:00:26] [INFO] 
+[2025-12-01 02:00:26] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 02:00:26] [INFO] DNA: [12, 13, 7, 1, 10, 15, 15, 6, 2, 11, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:00:26] [ARCHITECTURE] Child ep7_child1 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:05:20] [REWARD] Child ep7_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.6930, Reward = 0.332813
+[2025-12-01 02:05:20] [INFO] 
+[2025-12-01 02:05:20] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 02:05:20] [INFO] DNA: [12, 13, 7, 1, 10, 15, 15, 6, 2, 11, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:05:20] [ARCHITECTURE] Child ep7_child2 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:10:15] [REWARD] Child ep7_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7168, Reward = 0.368293
+[2025-12-01 02:10:15] [INFO] 
+[2025-12-01 02:10:15] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 02:10:15] [INFO] DNA: [12, 13, 7, 1, 10, 15, 15, 6, 2, 11, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 2, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:10:15] [ARCHITECTURE] Child ep7_child3 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:15:10] [REWARD] Child ep7_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7022, Reward = 0.346244
+[2025-12-01 02:15:10] [INFO] 
+[2025-12-01 02:15:10] [METRIC] ━━━ EPISODE 7 SUMMARY ━━━
+[2025-12-01 02:15:10] [INFO]   • Mean reward: 0.3491 ± 0.0146
+[2025-12-01 02:15:10] [INFO]   • Best child this episode: 0.3683
+[2025-12-01 02:15:10] [INFO]   • Worst child this episode: 0.3328
+[2025-12-01 02:15:10] [INFO]   • Baseline EMA: 0.3351
+[2025-12-01 02:15:10] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 02:15:10] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 02:15:10] [INFO]   • Mean advantage: -0.0000
+[2025-12-01 02:15:10] [INFO] 
+  Progress: 7/10 (70.0%)
+[2025-12-01 02:15:10] [INFO] 
+[2025-12-01 02:15:10] [STEP] ━━━ EPISODE 8/10 ━━━
+[2025-12-01 02:15:10] [INFO] Current depth: 8 layers
+[2025-12-01 02:15:10] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 02:15:10] [INFO] 
+[2025-12-01 02:15:10] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 02:15:10] [INFO] DNA: [11, 13, 7, 1, 10, 15, 15, 6, 2, 10, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 1, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:15:10] [ARCHITECTURE] Child ep8_child1 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:20:05] [REWARD] Child ep8_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.6708, Reward = 0.301842
+[2025-12-01 02:20:05] [INFO] 
+[2025-12-01 02:20:05] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 02:20:05] [INFO] DNA: [11, 13, 7, 1, 10, 15, 15, 6, 2, 10, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 1, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:20:05] [ARCHITECTURE] Child ep8_child2 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:25:00] [REWARD] Child ep8_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.6510, Reward = 0.275894
+[2025-12-01 02:25:00] [INFO] 
+[2025-12-01 02:25:00] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 02:25:00] [INFO] DNA: [11, 13, 7, 1, 10, 15, 15, 6, 2, 10, 7, 4, 5, 19, 16, 12, 3, 19, 2, 16, 3, 5, 1, 8, 4, 1, 7, 5, 9, 10, 1, 11]
+[2025-12-01 02:25:00] [ARCHITECTURE] Child ep8_child3 - Architecture built: 104,962 parameters, 8 conv layers, 0.40 MB
+[2025-12-01 02:29:55] [REWARD] Child ep8_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.7390, Reward = 0.403583
+[2025-12-01 02:29:55] [INFO] 
+[2025-12-01 02:29:55] [METRIC] ━━━ EPISODE 8 SUMMARY ━━━
+[2025-12-01 02:29:55] [INFO]   • Mean reward: 0.3271 ± 0.0551
+[2025-12-01 02:29:55] [INFO]   • Best child this episode: 0.4036
+[2025-12-01 02:29:55] [INFO]   • Worst child this episode: 0.2759
+[2025-12-01 02:29:55] [INFO]   • Baseline EMA: 0.3347
+[2025-12-01 02:29:55] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 02:29:55] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 02:29:55] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 02:29:55] [INFO] 
+  Progress: 8/10 (80.0%)
+[2025-12-01 02:29:55] [INFO] 
+[2025-12-01 02:29:55] [SUCCESS] LAYER SCHEDULE: Increasing depth to 10 layers (after 24 architectures)
+[2025-12-01 02:29:55] [INFO] 
+[2025-12-01 02:29:55] [INFO] 
+[2025-12-01 02:29:55] [STEP] ━━━ EPISODE 9/10 ━━━
+[2025-12-01 02:29:55] [INFO] Current depth: 10 layers
+[2025-12-01 02:29:55] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 02:29:55] [INFO] 
+[2025-12-01 02:29:55] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 02:29:55] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 6, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:29:55] [ARCHITECTURE] Child ep9_child1 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:34:30] [REWARD] Child ep9_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.6794, Reward = 0.313600
+[2025-12-01 02:34:30] [INFO] 
+[2025-12-01 02:34:30] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 02:34:30] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 6, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:34:30] [ARCHITECTURE] Child ep9_child2 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:39:03] [REWARD] Child ep9_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.6774, Reward = 0.310839
+[2025-12-01 02:39:03] [INFO] 
+[2025-12-01 02:39:03] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 02:39:03] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 6, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:39:03] [ARCHITECTURE] Child ep9_child3 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:43:38] [REWARD] Child ep9_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.6808, Reward = 0.315543
+[2025-12-01 02:43:38] [INFO] 
+[2025-12-01 02:43:38] [METRIC] ━━━ EPISODE 9 SUMMARY ━━━
+[2025-12-01 02:43:38] [INFO]   • Mean reward: 0.3133 ± 0.0019
+[2025-12-01 02:43:38] [INFO]   • Best child this episode: 0.3155
+[2025-12-01 02:43:38] [INFO]   • Worst child this episode: 0.3108
+[2025-12-01 02:43:38] [INFO]   • Baseline EMA: 0.3133
+[2025-12-01 02:43:38] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 02:43:38] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 02:43:38] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 02:43:38] [INFO] 
+  Progress: 9/10 (90.0%)
+[2025-12-01 02:43:38] [INFO] 
+[2025-12-01 02:43:38] [STEP] ━━━ EPISODE 10/10 ━━━
+[2025-12-01 02:43:38] [INFO] Current depth: 10 layers
+[2025-12-01 02:43:38] [INFO] Generating and evaluating 3 architectures...
+[2025-12-01 02:43:38] [INFO] 
+[2025-12-01 02:43:38] [TRAINING] → Evaluating architecture 1/3
+[2025-12-01 02:43:38] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 5, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:43:38] [ARCHITECTURE] Child ep10_child1 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:48:13] [REWARD] Child ep10_child1 - Training completed: Max Val Acc (last 3 epochs) = 0.6586, Reward = 0.285670
+[2025-12-01 02:48:13] [INFO] 
+[2025-12-01 02:48:13] [TRAINING] → Evaluating architecture 2/3
+[2025-12-01 02:48:13] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 5, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:48:13] [ARCHITECTURE] Child ep10_child2 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:52:46] [REWARD] Child ep10_child2 - Training completed: Max Val Acc (last 3 epochs) = 0.7054, Reward = 0.350999
+[2025-12-01 02:52:46] [INFO] 
+[2025-12-01 02:52:46] [TRAINING] → Evaluating architecture 3/3
+[2025-12-01 02:52:46] [INFO] DNA: [8, 1, 1, 23, 1, 6, 3, 14, 5, 2, 4, 5, 2, 1, 2, 11, 1, 9, 3, 4, 3, 10, 16, 10, 5, 5, 1, 2, 3, 1, 6, 5, 1, 1, 7, 4, 5, 17, 3, 1]
+[2025-12-01 02:52:46] [ARCHITECTURE] Child ep10_child3 - Architecture built: 64,738 parameters, 10 conv layers, 0.25 MB
+[2025-12-01 02:57:19] [REWARD] Child ep10_child3 - Training completed: Max Val Acc (last 3 epochs) = 0.6734, Reward = 0.305365
+[2025-12-01 02:57:19] [INFO] 
+[2025-12-01 02:57:19] [METRIC] ━━━ EPISODE 10 SUMMARY ━━━
+[2025-12-01 02:57:19] [INFO]   • Mean reward: 0.3140 ± 0.0274
+[2025-12-01 02:57:19] [INFO]   • Best child this episode: 0.3510
+[2025-12-01 02:57:19] [INFO]   • Worst child this episode: 0.2857
+[2025-12-01 02:57:19] [INFO]   • Baseline EMA: 0.3134
+[2025-12-01 02:57:19] [INFO]   • Global best architecture: 0.4158
+[2025-12-01 02:57:19] [INFO]   • Controller learning rate: 0.000600
+[2025-12-01 02:57:19] [INFO]   • Mean advantage: 0.0000
+[2025-12-01 02:57:19] [INFO] 
+  Progress: 10/10 (100.0%)
+[2025-12-01 02:57:19] [INFO] 
+[2025-12-01 02:57:19] [STEP] Saving checkpoint for episode 10...
+[2025-12-01 02:57:19] [SUCCESS] Checkpoint saved successfully: checkpoints\nas_demo\nas_episode_10.pth
+[2025-12-01 02:57:19] [INFO] 
+[2025-12-01 02:57:19] [SUCCESS] ======================================================================
+[2025-12-01 02:57:19] [SUCCESS] NEURAL ARCHITECTURE SEARCH COMPLETED
+[2025-12-01 02:57:19] [SUCCESS] ======================================================================
+[2025-12-01 02:57:19] [INFO] 
+[2025-12-01 02:57:19] [METRIC] FINAL RESULTS:
+[2025-12-01 02:57:19] [INFO]   • Best reward (Val Acc): 0.4158
+[2025-12-01 02:57:19] [INFO]   • Total episodes: 10
+[2025-12-01 02:57:19] [INFO]   • Total architectures evaluated: 30
+[2025-12-01 02:57:19] [INFO]   • Mean reward (last 10): 0.3487
+[2025-12-01 02:57:19] [INFO]   • Mean reward (overall): 0.3487
+[2025-12-01 02:57:19] [INFO] 
+[2025-12-01 02:57:19] [SUCCESS] BEST ARCHITECTURE FOUND:
+[2025-12-01 02:57:19] [INFO] DNA Architecture:
+--------------------------------------------------
+Layer 1: K=1x1, F=2, S=19, P=11x11
+Layer 2: K=23x23, F=26, S=7, P=10x10
+Layer 3: K=4x4, F=8, S=5, P=4x4
+Layer 4: K=15x15, F=9, S=1, P=1x1
+Layer 5: K=8x8, F=2, S=12, P=10x10
+Layer 6: K=10x10, F=18, S=3, P=3x3
+[2025-12-01 02:57:19] [SUCCESS] ======================================================================
+[2025-12-01 02:57:19] [SUCCESS] Checkpoint saved successfully: checkpoints\nas_demo\nas_final.pth

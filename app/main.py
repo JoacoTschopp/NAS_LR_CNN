@@ -65,7 +65,7 @@ def run_nas_search(args):
     start_time = time.time()
     
     print("\n" + "="*70)
-    print("🔍 MODO: NEURAL ARCHITECTURE SEARCH")
+    print("MODO: NEURAL ARCHITECTURE SEARCH")
     print("="*70)
     print(f"Configuración: {args.config}")
     print(f"Episodios: {args.episodes or 'default'}")
@@ -108,9 +108,9 @@ def run_nas_search(args):
         num_workers=2
     )
     
-    print(f"✓ Train: {len(train_dataset)} imágenes")
-    print(f"✓ Val: {len(val_dataset)} imágenes")
-    print(f"✓ Batch size: {batch_size}")
+    print(f"Train: {len(train_dataset)} imágenes")
+    print(f"Val: {len(val_dataset)} imágenes")
+    print(f"Batch size: {batch_size}")
     print("="*70 + "\n")
     
     # Crear NAS Trainer
@@ -131,7 +131,7 @@ def run_nas_search(args):
     # Resumen final
     elapsed_total = time.time() - start_time
     print("\n" + "="*70)
-    print("🏁 BÚSQUEDA NAS FINALIZADA")
+    print("BÚSQUEDA NAS FINALIZADA")
     print("="*70)
     print(f"Tiempo total: {format_elapsed_time(elapsed_total)}")
     print(f"Mejor reward: {trainer.best_reward:.4f}")
@@ -154,7 +154,7 @@ def run_nascnn15_training(args):
     start_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     print("\n" + "="*70)
-    print("🎯 MODO: ENTRENAMIENTO NASCNN15")
+    print("MODO: ENTRENAMIENTO NASCNN15")
     print("="*70)
     print(f"Fecha y hora: {start_datetime}")
     print("="*70 + "\n")
@@ -189,7 +189,7 @@ def run_nascnn15_training(args):
     
     elapsed_prep = time.time() - start_time
     print("\n" + "="*70)
-    print(f"✓ PREPROCESAMIENTO COMPLETADO")
+    print("PREPROCESAMIENTO COMPLETADO")
     print(f"  Tiempo transcurrido: {format_elapsed_time(elapsed_prep)}")
     print("="*70 + "\n")
 
@@ -251,9 +251,9 @@ def run_nascnn15_training(args):
     print("="*70)
     print("DATASET")
     print("="*70)
-    print(f"✓ Train set: {len(train_dataloader.dataset)} imágenes")
-    print(f"✓ Validation set: {len(validation_dataloader.dataset)} imágenes")
-    print(f"✓ Test set: {len(cifar10_test)} imágenes")
+    print(f"Train set: {len(train_dataloader.dataset)} imágenes")
+    print(f"Validation set: {len(validation_dataloader.dataset)} imágenes")
+    print(f"Test set: {len(cifar10_test)} imágenes")
 
     # Crear modelo
     model = NASCNN15()
@@ -262,7 +262,7 @@ def run_nascnn15_training(args):
     print("SELECCIÓN DE MODELO")
     print("="*70)
     print(" ")
-    print(f"✓ {model.__class__.__name__}")
+    print(f"Modelo seleccionado: {model.__class__.__name__}")
     print("="*70)
 
 
@@ -270,8 +270,8 @@ def run_nascnn15_training(args):
     # Crear pipeline de entrenamiento
     pipeline = TrainingPipeline(model, config)
 
-    print(f"✓ Pipeline inicializado")
-    print(f"✓ Total de parámetros: {sum(p.numel() for p in model.parameters()):,}")
+    print("Pipeline inicializado")
+    print(f"Total de parámetros: {sum(p.numel() for p in model.parameters()):,}")
 
     # ==============================================================================
     # ENTRENAMIENTO
@@ -281,7 +281,7 @@ def run_nascnn15_training(args):
     
     elapsed_train = time.time() - start_time
     print("\n" + "="*70)
-    print(f"✓ ENTRENAMIENTO COMPLETADO")
+    print("ENTRENAMIENTO COMPLETADO")
     print(f"  Tiempo transcurrido: {format_elapsed_time(elapsed_train)}")
     print("="*70 + "\n")
     
@@ -312,7 +312,7 @@ def run_nascnn15_training(args):
     
     elapsed_viz = time.time() - start_time
     print("\n" + "="*70)
-    print(f"✓ VISUALIZACIONES COMPLETADAS")
+    print("VISUALIZACIONES COMPLETADAS")
     print(f"  Tiempo transcurrido: {format_elapsed_time(elapsed_viz)}")
     print("="*70 + "\n")
 
@@ -334,7 +334,7 @@ def run_nascnn15_training(args):
     
     elapsed_total = time.time() - start_time
     print("\n" + "="*70)
-    print(f"✓ TEST COMPLETADO")
+    print("TEST COMPLETADO")
     print(f"  Tiempo transcurrido: {format_elapsed_time(elapsed_total)}")
     print("="*70 + "\n")
     
