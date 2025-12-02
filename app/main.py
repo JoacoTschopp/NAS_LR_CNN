@@ -356,16 +356,22 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
             Ejemplos:
+            # Demo NAS (simula paper con 30 arquitecturas, schedule progresivo, logs completos)
+            python main.py --mode nas --config demo
+            
             # Búsqueda NAS rápida (pruebas)
             python main.py --mode nas --config fast --episodes 10 --children 3
             
-            # Búsqueda NAS completa
+            # Búsqueda NAS exhaustiva (paper NASCNN15, ~12.800 arquitecturas)
+            python main.py --mode nas --config nascnn15
+            
+            # Búsqueda NAS intermedia (configuración por defecto)
             python main.py --mode nas --config default
             
             # Entrenamiento NASCNN15
             python main.py --mode train
             
-            # Reanudar búsqueda NAS
+            # Reanudar búsqueda NAS (ejemplo para config "default")
             python main.py --mode nas --resume checkpoints/nas/nas_episode_50.pth
         '''
     )

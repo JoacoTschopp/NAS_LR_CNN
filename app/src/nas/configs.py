@@ -140,11 +140,11 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
             # Simula el paper pero con parámetros reducidos para viabilidad computacional
             
             # Controller parameters (igual que paper)
-            'max_layers': 6,  # Empieza en 6
+            'max_layers': 7,  # Empieza en 6
             'layer_schedule': True,  # Activar schedule progresivo
-            'layer_increment': 2,  # +2 capas cada vez
-            'increment_every': 12,  # Cada 12 arquitecturas (en lugar de 1,600)
-            'max_layer_limit': 12,  # Límite: 12 capas (en lugar de 15)
+            'layer_increment': 1,  # +2 capas cada vez
+            'increment_every': 16,  # Cada 12 arquitecturas (en lugar de 1,600)
+            'max_layer_limit': 17,  # Límite: 16 capas (para dar lugar a una de 15)
             
             'components_per_layer': 4,
             'lstm_hidden_size': 35,  # Según paper
@@ -160,15 +160,15 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
             'child_momentum': 0.9,
             'child_nesterov': True,
             'child_weight_decay': 1e-4,
-            'child_epochs': 10,  # 10 épocas (en lugar de 50) para demo
+            'child_epochs': 20,  # 20 épocas (en lugar de 50) para demo
             'child_batch_size': 128,
             'child_dropout': 0.0,
-            'reward_top_k': 3,  # Max de últimas 3 épocas (en lugar de 5)
+            'reward_top_k': 5,  # Max de últimas 5 épocas (en lugar de 5)
             'reward_power': 3,  # Al cubo
             
             # NAS Search parameters (reducido para demo)
             'max_episodes': 10,  # 10 episodes
-            'children_per_episode': 3,  # 3 arquitecturas por episode = 30 total
+            'children_per_episode': 16,  # 3 arquitecturas por episode = 30 total
             'save_every': 5,
             
             'checkpoint_dir': 'checkpoints/nas_demo',
