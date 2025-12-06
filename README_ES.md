@@ -120,18 +120,14 @@ Capa totalmente conectada (10 clases)
 
 #### Modo 1: Búsqueda NAS
 
-- **Prueba rápida (5-10 min):**
+- **Demo NAS (búsqueda reducida para demostración):**
   ```bash
-  cd app
-  python main.py --mode nas --config fast --episodes 5 --children 2
+  cd VC-ARN/app
+  python main.py --mode nas --config demo
   ```
-- **Búsqueda corta (experimental):**
+- **Búsqueda NAS-RL completa (similar al paper, ~12.800 arquitecturas):**
   ```bash
-  python main.py --mode nas --config fast --episodes 50 --children 5
-  ```
-- **Búsqueda completa (producción):**
-  ```bash
-  python main.py --mode nas --config default
+  python main.py --mode nas --config nasrlfull
   ```
 - **Reanudar desde checkpoint:**
   ```bash
@@ -152,11 +148,10 @@ python main.py --help
 
 ### Configuraciones
 
-| Configuración | Episodios | Hijos/episodio | Épocas por hijo | Arquitecturas totales | Tiempo aprox. |
-| -------------- | --------- | -------------- | ---------------- | --------------------- | ------------- |
-| `fast`       | 100       | 5              | 20               | 500                   | 2-3 horas     |
-| `default`    | 2,000     | 10             | 100              | 20,000                | 100-150 horas |
-| `thorough`   | 5,000     | 15             | 150              | 75,000                | 500-600 horas |
+Se exponen dos configuraciones principales de NAS:
+
+- `demo`: Demostración reducida del proceso NAS, pensada para experimentación rápida y análisis de logs.
+- `nasrlfull`: Búsqueda NAS-RL completa que replica el paper de Zoph & Le (2017) (~12.800 arquitecturas).
 
 ## 📁 Estructura del Proyecto
 

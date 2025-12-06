@@ -29,11 +29,10 @@ python analyze_nas_logs.py logs/nas_demo/nas_search_*.log
 
 ## Configuraciones Disponibles
 
-| Config | Arquitecturas | Propósito | Tiempo Estimado |
-|--------|--------------|-----------|-----------------|
-| `demo` | 30 | **Demostración del proceso NAS** | 2-3 horas |
-| `fast` | ~50 | Prueba rápida básica | 3-4 horas |
-| `nascnn15` | 12,800 | Búsqueda completa según paper | ~semanas |
+| Config        | Arquitecturas | Propósito                              | Tiempo Estimado |
+| ------------- | ------------- | --------------------------------------- | --------------- |
+| `demo`      | 160           | **Demostración del proceso NAS** | +24 horas      |
+| `nasrlfull` | 12,800        | Búsqueda completa según paper         | ~semanas        |
 
 **Recomendado: `demo`** - Balancea demostración completa con viabilidad computacional.
 
@@ -44,6 +43,7 @@ python analyze_nas_logs.py logs/nas_demo/nas_search_*.log
 El archivo `logs/nas_demo/nas_search_TIMESTAMP.log` contiene:
 
 #### 1. Configuración Inicial
+
 ```
 SEARCH CONFIGURATION:
   • Total episodes: 10
@@ -55,6 +55,7 @@ SEARCH CONFIGURATION:
 ```
 
 #### 2. Schedule Progresivo de Capas
+
 ```
 🔼 LAYER SCHEDULE: Increasing depth to 8 layers (after 12 architectures)
 🔼 LAYER SCHEDULE: Increasing depth to 10 layers (after 24 architectures)
@@ -63,6 +64,7 @@ SEARCH CONFIGURATION:
 Esto replica el comportamiento del paper donde la profundidad aumenta durante la búsqueda.
 
 #### 3. Generación de Arquitecturas
+
 ```
 ━━━ EPISODE 1/10 ━━━
 Current depth: 6 layers
@@ -71,6 +73,7 @@ Child ep1_child1 - Architecture built: 125,482 parameters, 6 conv layers, 0.48 M
 ```
 
 #### 4. Entrenamiento y Rewards
+
 ```
 Child ep1_child1 - Training completed:
   Max Val Acc (last 3 epochs) = 0.2845
@@ -78,6 +81,7 @@ Child ep1_child1 - Training completed:
 ```
 
 #### 5. Actualización REINFORCE
+
 ```
 ━━━ EPISODE 1 SUMMARY ━━━
   • Mean reward: 0.026764 ± 0.003726
@@ -109,6 +113,7 @@ python analyze_nas_logs.py logs/nas_demo/nas_search_*.log
 ```
 
 Genera resumen con:
+
 - Schedule de capas ejecutado
 - Evolución de rewards por episodio
 - Top 5 mejores arquitecturas
@@ -133,17 +138,17 @@ SCHEDULE PROGRESIVO DE CAPAS:
   • Después de 24 arquitecturas → 10 capas
 
 EVOLUCIÓN DE REWARDS:
-  Episode    Mean Reward     Best Child      Global Best    
+  Episode    Mean Reward     Best Child      Global Best  
   ---------- --------------- --------------- ---------------
-  1          0.026764        0.030489        0.030489       
-  2          0.032156        0.038921        0.038921       
+  1          0.026764        0.030489        0.030489     
+  2          0.032156        0.038921        0.038921     
   ...
 
 TOP 5 ARQUITECTURAS:
-  ID                   Val Acc         Reward         
+  ID                   Val Acc         Reward       
   -------------------- --------------- ---------------
-  ep5_child2           0.3456          0.041298       
-  ep3_child1           0.3312          0.036352       
+  ep5_child2           0.3456          0.041298     
+  ep3_child1           0.3312          0.036352     
   ...
 
 ESTADÍSTICAS FINALES:
@@ -179,6 +184,7 @@ PROCESO NAS COMPLETADO Y DOCUMENTADO
 ### ¿Qué Esperar?
 
 En el demo con 30 arquitecturas y 10 épocas:
+
 - **Validation accuracy**: ~30-40% (baseline aleatorio: 10%)
 - **Mejora observable**: Rewards típicamente aumentan durante la búsqueda
 - **Schedule visible**: Claramente documentado en logs
@@ -187,6 +193,7 @@ En el demo con 30 arquitecturas y 10 épocas:
 ### ¿Por Qué No Se Alcanza 92%?
 
 El paper alcanza ~92% test accuracy porque:
+
 1. Entrena 12,800 arquitecturas (vs 30)
 2. Usa 50 épocas por child (vs 10)
 3. Luego hace grid search de hiperparámetros
@@ -216,10 +223,11 @@ Si quieres ejecutar la búsqueda completa del paper:
 
 ```bash
 # Advertencia: Tomará semanas y requerirá GPU potente
-python main.py --mode nas --config nascnn15
+python main.py --mode nas --config nasrlfull
 ```
 
 Esto ejecutará:
+
 - 12,800 arquitecturas
 - 50 épocas cada una
 - Schedule completo hasta 15 capas
@@ -234,6 +242,7 @@ Esto ejecutará:
 ## Contribuciones
 
 Este proyecto implementa fielmente el algoritmo NAS con énfasis en:
+
 - ✅ Reproducibilidad del proceso
 - ✅ Documentación exhaustiva en logs
 - ✅ Fidelidad a hiperparámetros del paper

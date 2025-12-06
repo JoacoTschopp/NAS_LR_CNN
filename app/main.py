@@ -6,14 +6,11 @@ Este script proporciona dos modos de operación:
     2. NASCNN15 Training: Entrenamiento completo de NASCNN15
 
 Uso:
-    # Demo NAS (simula paper con 30 arquitecturas, schedule progresivo, logs completos)
+    # Demo NAS (simula el paper con configuración reducida, ~30 arquitecturas)
     python main.py --mode nas --config demo
     
-    # Búsqueda NAS (modo rápido para pruebas)
-    python main.py --mode nas --config fast --episodes 10 --children 3
-    
-    # Búsqueda NAS completa del paper (12,800 arquitecturas)
-    python main.py --mode nas --config nascnn15
+    # Búsqueda NAS-RL completa (NASRL full, ~12.800 arquitecturas)
+    python main.py --mode nas --config nasrlfull
     
     # Entrenamiento NASCNN15
     python main.py --mode train
@@ -163,7 +160,7 @@ def run_nascnn15_training(args):
     que_fierro_tengo()
 
     # Experimento Nombre y rutas (simplificadas)
-    experiment_name = "NASCNN15_Production"
+    experiment_name = "NASCNN15_V1.0"
     experiments_root = Path("../experiments")
     experiment_dir = experiments_root / experiment_name
 
@@ -356,22 +353,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
             Ejemplos:
-            # Demo NAS (simula paper con 30 arquitecturas, schedule progresivo, logs completos)
+            # Demo NAS (simula el paper con configuración reducida)
             python main.py --mode nas --config demo
             
-            # Búsqueda NAS rápida (pruebas)
-            python main.py --mode nas --config fast --episodes 10 --children 3
-            
-            # Búsqueda NAS exhaustiva (paper NASCNN15, ~12.800 arquitecturas)
-            python main.py --mode nas --config nascnn15
-            
-            # Búsqueda NAS intermedia (configuración por defecto)
-            python main.py --mode nas --config default
+            # Búsqueda NAS-RL completa (NASRL full, ~12.800 arquitecturas)
+            python main.py --mode nas --config nasrlfull
             
             # Entrenamiento NASCNN15
             python main.py --mode train
             
-            # Reanudar búsqueda NAS (ejemplo para config "default")
+            # Reanudar búsqueda NAS (demo o nasrlfull)
             python main.py --mode nas --resume checkpoints/nas/nas_episode_50.pth
         '''
     )
@@ -389,9 +380,9 @@ def main():
     nas_group.add_argument(
         '--config',
         type=str,
-        default='fast',
-        choices=['default', 'fast', 'thorough', 'nascnn15', 'demo'],
-        help='Configuración de NAS. "demo" simula el paper con parámetros reducidos. "nascnn15" es búsqueda completa.'
+        default='demo',
+        choices=['demo', 'nasrlfull'],
+        help='Configuración de NAS. "demo" es una demo reducida; "nasrlfull" replica la búsqueda completa del paper con NAS-RL.'
     )
     nas_group.add_argument(
         '--episodes',

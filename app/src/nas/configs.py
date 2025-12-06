@@ -8,12 +8,12 @@ based on Zoph & Le (2017) paper.
 from typing import Dict, Any
 
 
-def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
+def get_nas_config(config_name: str = 'demo') -> Dict[str, Any]:
     """
     Returns NAS hyperparameter configuration.
     
     Args:
-        config_name: Configuration name ('default', 'fast', 'thorough')
+        config_name: Configuration name ('demo', 'nasrlfull')
     
     Returns:
         Dictionary with hyperparameters
@@ -69,30 +69,6 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
             
             'checkpoint_dir': 'checkpoints/nas_fast',
             'log_dir': 'logs/nas_fast',
-        },
-        
-        'thorough': {
-            # Exhaustive search
-            'max_layers': 5,
-            'components_per_layer': 4,
-            'lstm_hidden_size': 150,
-            'controller_lr': 0.99,
-            'lr_decay': 0.96,
-            'lr_decay_steps': 1000,
-            'beta': 1e-4,
-            'baseline_ema_alpha': 0.95,
-            
-            'child_lr': 3e-5,
-            'child_epochs': 150,
-            'child_batch_size': 16,
-            'child_dropout': 0.2,
-            
-            'max_episodes': 5000,
-            'children_per_episode': 15,
-            'save_every': 100,
-            
-            'checkpoint_dir': 'checkpoints/nas_thorough',
-            'log_dir': 'logs/nas_thorough',
         },
         
         'nascnn15': {
@@ -176,6 +152,8 @@ def get_nas_config(config_name: str = 'default') -> Dict[str, Any]:
         }
     }
     
+    configs['nasrlfull'] = configs['nascnn15']
+
     if config_name not in configs:
         raise ValueError(f"Config '{config_name}' does not exist. Options: {list(configs.keys())}")
     

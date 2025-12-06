@@ -29,7 +29,7 @@ This project implements an automated neural architecture search system that uses
 
 ### How It Works
 
-The NAS system implemented in this project follows the approach from ["Neural Architecture Search with Reinforcement Learning"](https://arxiv.org/abs/1611.01578) (Zoph & Le, 2017):
+The NAS system implemented in this project follows the approach from [&#34;Neural Architecture Search with Reinforcement Learning&#34;](https://arxiv.org/abs/1611.01578) (Zoph & Le, 2017):
 
 ![NAS Architecture Overview](https://miro.medium.com/max/656/1*hIif88uJ7Te8MJEhm40rbw.png)
 
@@ -57,6 +57,7 @@ DNA = [
 ```
 
 **DNA Components:**
+
 - **Kernel Size**: 1-7 (conv kernel dimensions)
 - **Num Filters**: 32-512 (number of convolutional filters)
 - **Stride**: 1-2 (convolution stride)
@@ -73,6 +74,7 @@ The Controller is trained using the **REINFORCE** policy gradient algorithm:
    ```
    ∇J(θ) = E[R × ∇log P(a|θ)]
    ```
+
    where R is the reward (validation accuracy)
 
 ### NASCNN15 Architecture
@@ -96,6 +98,7 @@ Fully Connected (10 classes)
 ```
 
 **Key Features:**
+
 - No stride or pooling (maintains 32×32 resolution)
 - Dense skip connections (concatenation by channel)
 - Varying kernel sizes (1×1 to 7×7)
@@ -106,18 +109,19 @@ Fully Connected (10 classes)
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/your-username/VC-ARN.git
    cd VC-ARN
    ```
-
 2. **Create virtual environment:**
+
    ```bash
    python -m venv .venv
    source .venv/bin/activate  # Windows: .venv\Scripts\activate
    ```
-
 3. **Install dependencies:**
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -128,24 +132,21 @@ The system provides two main modes through a unified CLI:
 
 #### Mode 1: Neural Architecture Search
 
-**Quick test (5-10 minutes):**
+**Demo search (small-scale NAS, logs + controller behavior):**
+
 ```bash
-cd app
-python main.py --mode nas --config fast --episodes 5 --children 2
+cd VC-ARN/app
+python main.py --mode nas --config demo
 ```
 
-**Short search (experimental):**
-```bash
-python main.py --mode nas --config fast --episodes 50 --children 5
-```
+**Full NAS-RL search (paper-like, ~12,800 architectures):**
 
-**Full search (production):**
 ```bash
-python main.py --mode nas --config default
-# 2000 episodes × 10 children = 20,000 architectures evaluated
+python main.py --mode nas --config nasrlfull
 ```
 
 **Resume from checkpoint:**
+
 ```bash
 python main.py --mode nas --resume checkpoints/nas/nas_episode_50.pth
 ```
@@ -164,13 +165,10 @@ python main.py --help
 
 ### Configuration Options
 
-Three predefined NAS configurations:
+Two main NAS configurations are provided:
 
-| Config | Episodes | Children/Ep | Child Epochs | Total Archs | Est. Time |
-|--------|----------|-------------|--------------|-------------|-----------|
-| `fast` | 100 | 5 | 20 | 500 | ~2-3h |
-| `default` | 2,000 | 10 | 100 | 20,000 | ~100-150h |
-| `thorough` | 5,000 | 15 | 150 | 75,000 | ~500-600h |
+- `demo`: Small-scale NAS demo for experimentation and log analysis.
+- `nasrlfull`: Full NAS-RL search replicating the Zoph & Le (2017) setup (~12,800 architectures).
 
 ## 📁 Project Structure
 
@@ -205,28 +203,33 @@ VC-ARN/
 ### NAS Module Components
 
 **1. Controller (`controller.py`)**
+
 - LSTM-based architecture generator
 - ~11K trainable parameters
 - Generates DNA sequences for child networks
 
 **2. Child Builder (`child_builder.py`)**
+
 - Dynamically constructs CNNs from DNA
 - Validates and clips DNA to allowed ranges
 - Adds BatchNorm, ReLU, and optional pooling
 
 **3. REINFORCE Optimizer (`reinforce.py`)**
+
 - Policy gradient with baseline (EMA)
 - L2 regularization (β=1e-4)
 - Exponential LR decay
 - Gradient clipping
 
 **4. NAS Trainer (`trainer.py`)**
+
 - Orchestrates the full NAS process
 - Narrative logging for research documentation
 - Automatic checkpointing
 - Resume capability
 
 **5. Utilities (`utils.py`)**
+
 - DNA encode/decode/validate
 - Random DNA generation
 - Architecture visualization
@@ -234,6 +237,7 @@ VC-ARN/
 ### Training Pipeline
 
 The `TrainingPipeline` class provides:
+
 - Early stopping with patience
 - LR scheduling (ReduceLROnPlateau)
 - Checkpoint saving
@@ -243,6 +247,7 @@ The `TrainingPipeline` class provides:
 ### Logging System
 
 **8 hierarchical log levels:**
+
 - 📋 **INFO**: General information
 - ✅ **SUCCESS**: Successful operations
 - 🔹 **STEP**: Process steps
@@ -253,6 +258,7 @@ The `TrainingPipeline` class provides:
 - 🏆 **REWARD**: Rewards obtained
 
 **Example log output:**
+
 ```
 [2025-11-22 10:15:23] 📋 STARTING NEURAL ARCHITECTURE SEARCH
 [2025-11-22 10:15:23] 🔹 SEARCH CONFIGURATION:
@@ -275,18 +281,18 @@ The `TrainingPipeline` class provides:
 
 ### Classes
 
-| ID | Category | Examples |
-|----|----------|----------|
-| 0 | ✈️ Airplane | Aircraft, jets |
-| 1 | 🚗 Automobile | Cars, vans |
-| 2 | 🐦 Bird | Various bird species |
-| 3 | 🐱 Cat | Domestic cats |
-| 4 | 🦌 Deer | Deer, elk |
-| 5 | 🐕 Dog | Various dog breeds |
-| 6 | 🐸 Frog | Frogs and toads |
-| 7 | 🐎 Horse | Horses, ponies |
-| 8 | 🚢 Ship | Ships, boats |
-| 9 | 🚜 Truck | Trucks, trailers |
+| ID | Category      | Examples             |
+| -- | ------------- | -------------------- |
+| 0  | ✈️ Airplane | Aircraft, jets       |
+| 1  | 🚗 Automobile | Cars, vans           |
+| 2  | 🐦 Bird       | Various bird species |
+| 3  | 🐱 Cat        | Domestic cats        |
+| 4  | 🦌 Deer       | Deer, elk            |
+| 5  | 🐕 Dog        | Various dog breeds   |
+| 6  | 🐸 Frog       | Frogs and toads      |
+| 7  | 🐎 Horse      | Horses, ponies       |
+| 8  | 🚢 Ship       | Ships, boats         |
+| 9  | 🚜 Truck      | Trucks, trailers     |
 
 ### Challenges
 
@@ -299,21 +305,23 @@ The `TrainingPipeline` class provides:
 
 ### NASCNN15 Baseline
 
-| Metric | Value |
-|--------|-------|
-| Parameters | ~1.9M |
-| Test Accuracy | ~92.5% |
+| Metric        | Value      |
+| ------------- | ---------- |
+| Parameters    | ~4.2M      |
+| Test Accuracy | ~92.5%     |
 | Training Time | ~4-6 hours |
 
 ### NAS Search Results
 
 The NAS search explores thousands of architectures and tracks:
+
 - Best architecture found (saved to JSON)
 - Reward history over episodes
 - Convergence metrics (baseline, advantage)
 - Architecture diversity
 
 **Outputs:**
+
 - `checkpoints/nas/best_architecture.json` - Best architecture DNA
 - `checkpoints/nas/nas_final.pth` - Final checkpoint
 - `logs/nas/nas_search_TIMESTAMP.log` - Complete narrative log
@@ -364,6 +372,7 @@ This project is ideal for:
 ### For Research Papers
 
 The narrative logging system provides:
+
 - Complete process traceability
 - Step-by-step explanations
 - Detailed metrics per episode
@@ -376,6 +385,7 @@ Perfect for writing **Methodology** and **Results** sections with precise, trace
 ### Adding New Search Spaces
 
 Modify `configs.py` to change DNA limits:
+
 ```python
 DNA_LIMITS = {
     'kernel_size': (1, 7),
@@ -388,6 +398,7 @@ DNA_LIMITS = {
 ### Custom Architectures
 
 Extend `ChildNetworkBuilder.build_from_dna()` to support:
+
 - Different layer types (depthwise, grouped conv)
 - Attention mechanisms
 - Custom skip connections
@@ -395,6 +406,7 @@ Extend `ChildNetworkBuilder.build_from_dna()` to support:
 ### Alternative RL Algorithms
 
 The modular design allows replacing REINFORCE with:
+
 - PPO (Proximal Policy Optimization)
 - A2C (Advantage Actor-Critic)
 - Evolution Strategies
@@ -452,5 +464,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [PyTorch Documentation](https://pytorch.org/docs/)
 - [REINFORCE Algorithm](https://www.youtube.com/watch?v=CYUpDogeIL0)
 
-**Project Status:** 🟢 Production Ready  
+**Project Status:** 🟢 Production Ready
 **Last Updated:** November 22, 2025
